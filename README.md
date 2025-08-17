@@ -1,2 +1,7 @@
-# Correlation
-This repository is going to store octave scripts as well as implementation files of Correlation in Vitis HLS or VHDL
+# Correlation Project
+
+This repository contains:
+- **Octave/MATLAB scripts** for signal processing and analysis.
+- **Implementation files** of correlation algorithms in **Vitis HLS** and **VHDL**.
+
+The goal of this project is to provide reference implementations and scripts for experimenting with and testing correlation methods.
