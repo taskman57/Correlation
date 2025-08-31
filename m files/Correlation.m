@@ -58,10 +58,26 @@ function Correlation()
 
     % Plotting the results to visualize
     figure;
-    plot(lags/fs, correlation_result);
+    idx = lags/fs;
+    plot(idx, correlation_result);
     title('Cross-Correlation Result', 'fontsize', 20);
     xlabel('Time Lag (s)', 'fontsize', 20);
     ylabel('Correlation', 'fontsize', 20);
     grid minor on;
+
+    hold on;
+    [peak_val, peak_idx] = max(correlation_result);
+    peak_time = idx(peak_idx);
+
+    % Highlight the maximum point with a big red circle
+    plot(peak_time, peak_val, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
+
+    % Add a vertical dotted line at the peak
+    plot([peak_time peak_time], [min(correlation_result)-5 max(correlation_result)+5], 'r:', 'LineWidth', 1.5);
+
+    % Add the text annotation below the peak.
+    % The 'Interpreter', 'tex' property allows for bold font using '\bf'.
+    text(peak_time, max(correlation_result) - 0.5, '\bf Strong RX reception, detected correctly. ', ...
+    'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', 'FontSize', 14, 'Color', 'k', 'Interpreter', 'tex');
     % Uncomment above lines to visualize
 end
