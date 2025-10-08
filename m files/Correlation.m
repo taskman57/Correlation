@@ -31,7 +31,7 @@ function Correlation()
     T0 = 290;                               % Standard Noise Temperature (K)
 
     % Integration
-    Np = 30;                                 % <<< Set to 1 for UNDETECTABLE, then 100 for SUCCESS >>>
+    Np = 8;                                 % <<< Set to 1 for UNDETECTABLE, then 100 for SUCCESS >>>
 
     % --- Practical Noise Components ---
     f_ripple = 120;
@@ -45,14 +45,16 @@ function Correlation()
     Ns = round(PRI*fs);                     % Samples per PRI (2500 samples)
     N = round(T * fs);                      % Pulse samples (N=50, MF Gain is 16.99 dB)
     t_pulse = (0:N-1)/fs;
-    tx_signal_bb = exp(1i * 0*t_pulse);
+    B_chirp = 20e6;                         % Chirp bandwidth (20 MHz ??? ~7.5 m range resolution)
+    k_chirp = B_chirp / T;                  % Chirp rate
+    tx_signal_bb = exp(1i * pi * k_chirp * 1 * t_pulse.^2);   % LFM chirp
 
     TX = zeros(Ns, Np);
     for p = 1:Np
         TX(1:N, p) = tx_signal_bb;
     end
 
-    s1 = subplot(4,1,1);
+    s1 = subplot(3,1,1);
     plot(real(TX(:,1)));
     set( s1, 'title', 'Transmitted Signal (Real Part of Baseband)' , 'fontsize', 14);
     grid minor on;
@@ -98,7 +100,7 @@ function Correlation()
     scale_factor = sqrt(S_watts / P_ideal_current);
     RX_scaled = RX_ideal * scale_factor;
 
-    s2 = subplot(4,1,2);
+    s2 = subplot(3,1,2);
     plot(real(RX_scaled(:,1)));
     grid minor on;
     set(s2, 'title', sprintf('RX (Scaled to S=%.2eW) in PRI #1 (Visually undetectable)', S_watts) , 'fontsize', 14);
@@ -116,7 +118,7 @@ function Correlation()
 
     noisy_rx_sig = RX_scaled + noise_thermal + noise_ripple;
 
-    s3 = subplot(4,1,3);
+    s3 = subplot(3,1,3);
     plot(real(noisy_rx_sig(:,1)));
     grid minor on;
     set( s3, 'title', sprintf('Noisy RX (SNR=%.2fdB)', SNR_single_dB) , 'fontsize', 14);
