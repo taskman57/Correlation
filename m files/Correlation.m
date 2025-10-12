@@ -88,9 +88,10 @@ function Correlation()
 
     % --- RX matrix: delayed copy per pulse (Complex) ---
     RX_ideal = zeros(Ns, Np); % <<< FIXED: Initialized RX_ideal here >>>
+    f_d = 200; % Doppler shift in Hz
     for p = 1:Np
         if d+N-1 <= Ns
-            RX_ideal(d+1:d+N, p) = tx_signal_bb;
+            RX_ideal(d+1:d+N, p) = tx_signal_bb .* exp(1i * 2*pi * f_d * (t_pulse + (p-1)*PRI));
         end
     end
 
