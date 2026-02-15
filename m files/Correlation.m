@@ -131,7 +131,7 @@ function Correlation()
     h = conj(fliplr(tx_signal_bb)) / norm(tx_signal_bb);
     MF = zeros(Ns+N-1, Np);
     for p = 1:Np
-        MF(:, p) = conv(noisy_rx_sig(:, p), h);
+        MF(:, p) = myconv(noisy_rx_sig(:, p), h);
     end
 
     expected_conv_idx = d + N;
