@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="195.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="265.601 ns"></ZoomEndTime>
-      <Cursor1Time time="50.000 ns"></Cursor1Time>
+      <ZoomStartTime time="34.151 ns"></ZoomStartTime>
+      <ZoomEndTime time="184.567 ns"></ZoomEndTime>
+      <Cursor1Time time="908.169 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="257"></NameColumnWidth>
-      <ValueColumnWidth column_width="68"></ValueColumnWidth>
+      <ValueColumnWidth column_width="64"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="8" />
    <wvobject fp_name="/test_fix_round/clk_i" type="logic">
@@ -25,17 +25,17 @@
       <obj_property name="ObjectShortName">clk_i</obj_property>
    </wvobject>
    <wvobject fp_name="/test_fix_round/numb_i" type="array">
-      <obj_property name="ElementShortName">numb_i[4:0]</obj_property>
-      <obj_property name="ObjectShortName">numb_i[4:0]</obj_property>
-      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="ElementShortName">numb_i[2:0]</obj_property>
+      <obj_property name="ObjectShortName">numb_i[2:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
       <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
       <obj_property name="radix_fractionWidth">2</obj_property>
       <obj_property name="radix_otherWidth">0</obj_property>
    </wvobject>
    <wvobject fp_name="/test_fix_round/numb_o" type="array">
-      <obj_property name="ElementShortName">numb_o[4:0]</obj_property>
-      <obj_property name="ObjectShortName">numb_o[4:0]</obj_property>
-      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="ElementShortName">numb_o[2:0]</obj_property>
+      <obj_property name="ObjectShortName">numb_o[2:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
       <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
       <obj_property name="radix_fractionWidth">2</obj_property>
       <obj_property name="radix_otherWidth">0</obj_property>
@@ -57,7 +57,7 @@
       <obj_property name="ObjectShortName">clk_freq</obj_property>
    </wvobject>
    <wvobject fp_name="/test_fix_round/test_fix_c" type="array">
-      <obj_property name="ElementShortName">test_fix_c[0:15][4:0]</obj_property>
-      <obj_property name="ObjectShortName">test_fix_c[0:15][4:0]</obj_property>
+      <obj_property name="ElementShortName">test_fix_c[0:7][2:0]</obj_property>
+      <obj_property name="ObjectShortName">test_fix_c[0:7][2:0]</obj_property>
    </wvobject>
 </wave_config>

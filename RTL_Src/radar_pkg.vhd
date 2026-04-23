@@ -124,7 +124,6 @@ function conv_round(a: in std_logic_vector; frc_len: in integer) return std_logi
     constant NEG_MAX    : std_logic_vector(a'length-1 downto 0) :=(a'high => '1', others => '0');
     constant POS_MAX    : std_logic_vector(a'length-1 downto 0) :=(a'high => '0', others => '1');
     variable ret_val    : std_logic_vector(a'length downto 0);
-    constant frc_half   : unsigned(frc_len-1 downto 0) := shift_left(to_unsigned(1,frc_len), frc_len-1);
     variable orig_sign  : std_logic;
     variable ovf_sign   : std_logic:='0';
 begin
@@ -132,21 +131,23 @@ begin
     orig_sign   := a(a'left);
     ret_val     := orig_sign & a;
     if frc_len > 0 then     -- fixed-point value (fractional bits present)
-        if unsigned(ret_val(frc_len-1 downto 0)) = frc_half then    -- check if it is equal to 0.5!
+        if unsigned(ret_val(frc_len-1 downto 0)) = shift_left(to_unsigned(1,frc_len), frc_len-1) then    -- check if it is equal to 0.5!
             if ret_val(frc_len) = '1' then
                 ret_val(ret_val'left downto frc_len) := std_logic_vector(unsigned(ret_val(ret_val'left downto frc_len))+1);
             end if;
         else
-            ret_val := std_logic_vector(unsigned(ret_val) + frc_half);
+            ret_val := std_logic_vector(unsigned(ret_val) + shift_left(to_unsigned(1,frc_len), frc_len-1));
         end if;
-        if ret_val(ret_val'left-1) /= ret_val(ret_val'left) then    -- sign bit has changed
-            if orig_sign = '0' then
-                ret_val(a'left downto 0) := POS_MAX;
-            else
-                ret_val(a'left downto 0) := NEG_MAX;
-            end if;
-            ovf_sign    := '1';
+    end if;
+    if ret_val(ret_val'left-1) /= ret_val(ret_val'left) then    -- sign bit has changed
+        if orig_sign = '0' then
+            ret_val(a'left downto 0) := POS_MAX;
         else
+            ret_val(a'left downto 0) := NEG_MAX;
+        end if;
+        ovf_sign    := '1';
+    else
+        if frc_len > 0 then
             ret_val(frc_len-1 downto 0) := (others => '0');
         end if;
     end if;

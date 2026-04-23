@@ -8,7 +8,7 @@ use work.radar_pkg.all;
 entity fix_round is
     generic(
         inp_int_g   : integer :=3;
-        inp_frc_g   : integer :=2
+        inp_frc_g   : integer :=0
     );
     port(
         clk_i   : in std_logic;
