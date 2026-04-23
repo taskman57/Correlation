@@ -41,18 +41,19 @@ function [rounded_val, ovf] = myround(val, intb, frcb)
     else
       rnd_val += 2^(frcb-1);              % add 0.5
     endif
-    if bitget(rnd_val, intw) != bitget(rnd_val, intw+1)
-      if sign == 0
-        rnd_val = POS_MAX;
-      else
-        rnd_val = NEG_MAX;
-      endif
-      ovf = 1;
-    else
-      mask = bitcmp(2^frcb-1, intw);
-      rnd_val = bitand(rnd_val, mask);    % clear all fractional bits
-    endif
   endif
+  if bitget(rnd_val, intw) != bitget(rnd_val, intw+1)
+    if sign == 0
+      rnd_val = POS_MAX;
+    else
+      rnd_val = NEG_MAX;
+    endif
+    ovf = 1;
+  else
+    mask = bitcmp(2^frcb-1, intw);
+    rnd_val = bitand(rnd_val, mask);    % clear all fractional bits
+  endif
+
   rnd_val = rnd_val - ...                 % convert to negative numbers
   (rnd_val >= 2^(intw-1)) * 2^intw;
   rounded_val = rnd_val/2^frcb;
