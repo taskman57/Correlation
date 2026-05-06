@@ -41,4 +41,5 @@
 *.dwo
 
 /ipcore/*
-!*.xci
+!/ipcore/**/
+!/ipcore/**/*.xce
