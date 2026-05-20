@@ -113,6 +113,53 @@ package radar_pkg is
         x"0000"
     );
 
+    -- Gain of TX/RX antenna and Calculated System Parameters (R=7000m):
+    -- Antenna gain for both TX & RX: 20 dBi
+    -- - Pt: 1000.00 W, MF Gain: 16.99 dB
+    -- - Single-Pulse SNR (Theoretical): -20.25 dB
+    -- - S_watts: 3.78e-16 W, N_thermal: 4.00e-14 W
+    -- Pulse 1: I=-1711, Q=-5994 | Octave Phase: -1.8489 rad | CORDIC Expected (Fixed): -4821
+    -- Pulse 2: I=-2680, Q=-4921 | Octave Phase: -2.0695 rad | CORDIC Expected (Fixed): -5396
+    -- Pulse 3: I=-829, Q=-7709 | Octave Phase: -1.6779 rad | CORDIC Expected (Fixed): -4375
+    -- Pulse 4: I=-2485, Q=-3332 | Octave Phase: -2.2116 rad | CORDIC Expected (Fixed): -5767
+    -- Pulse 5: I=-1775, Q=2701 | Octave Phase: 2.1522 rad | CORDIC Expected (Fixed): 5612
+    -- Pulse 6: I=-4592, Q=1950 | Octave Phase: 2.7400 rad | CORDIC Expected (Fixed): 7145
+    -- Pulse 7: I=-3360, Q=-7064 | Octave Phase: -2.0148 rad | CORDIC Expected (Fixed): -5254
+    -- Pulse 8: I=-6348, Q=-8530 | Octave Phase: -2.2106 rad | CORDIC Expected (Fixed): -5764
+    -- Pulse 9: I=-2013, Q=-8433 | Octave Phase: -1.8051 rad | CORDIC Expected (Fixed): -4707
+    -- Pulse 10: I=-3573, Q=-4566 | Octave Phase: -2.2348 rad | CORDIC Expected (Fixed): -5827
+    -- Pulse 11: I=-275, Q=-4227 | Octave Phase: -1.6358 rad | CORDIC Expected (Fixed): -4265
+    type pulse_IQ_t is array(0 to 11) of signed(15 downto 0);
+    signal inph_c : pulse_IQ_t := (
+        to_signed(-1711,16),
+        to_signed(-2680,16),
+        to_signed(-829,16),
+        to_signed(-2485,16),
+        to_signed(-1775,16),
+        to_signed(-4592,16),
+        to_signed(-3360,16),
+        to_signed(-6348,16),
+        to_signed(-2013,16),
+        to_signed(-3573,16),
+        to_signed(-275,16),
+        to_signed(-11357,16)
+    );
+
+    signal quadr_c : pulse_IQ_t := (
+        to_signed(-5994,16),
+        to_signed(-4921,16),
+        to_signed(-7709,16),
+        to_signed(-3332,16),
+        to_signed(2701,16),
+        to_signed(1950,16),
+        to_signed(-7064,16),
+        to_signed(-8530,16),
+        to_signed(-8433,16),
+        to_signed(-4566,16),
+        to_signed(-4227,16),
+        to_signed(-10190,16)
+    );
+
     -- This function rounds fix-point numbers to even(convergent rounding)
     function conv_round(a: in std_logic_vector; frc_len: in integer) return std_logic_vector;
 

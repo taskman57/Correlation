@@ -3,75 +3,49 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="IQ2Vect_tb_behav.wdb" id="1">
+      <db_ref path="tb_myconv_behav.wdb" id="1">
          <top_modules>
-            <top_module name="IQ2Vect_tb" />
             <top_module name="radar_pkg" />
+            <top_module name="tb_myconv" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2.322574 us"></ZoomStartTime>
-      <ZoomEndTime time="75.922575 us"></ZoomEndTime>
-      <Cursor1Time time="32.222574 us"></Cursor1Time>
+      <ZoomStartTime time="8.241 ns"></ZoomStartTime>
+      <ZoomEndTime time="93.407 ns"></ZoomEndTime>
+      <Cursor1Time time="343.864 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="247"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="126"></NameColumnWidth>
+      <ValueColumnWidth column_width="177"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="9" />
-   <wvobject fp_name="/IQ2Vect_tb/sys_clk_i" type="logic">
-      <obj_property name="ElementShortName">sys_clk_i</obj_property>
-      <obj_property name="ObjectShortName">sys_clk_i</obj_property>
+   <WVObjectSize size="7" />
+   <wvobject fp_name="/tb_myconv/clk_i" type="logic">
+      <obj_property name="ElementShortName">clk_i</obj_property>
+      <obj_property name="ObjectShortName">clk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/sys_rst_i" type="logic">
-      <obj_property name="ElementShortName">sys_rst_i</obj_property>
-      <obj_property name="ObjectShortName">sys_rst_i</obj_property>
+   <wvobject fp_name="/tb_myconv/rst_i" type="logic">
+      <obj_property name="ElementShortName">rst_i</obj_property>
+      <obj_property name="ObjectShortName">rst_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/inp_val_i" type="logic">
-      <obj_property name="ElementShortName">inp_val_i</obj_property>
-      <obj_property name="ObjectShortName">inp_val_i</obj_property>
+   <wvobject fp_name="/tb_myconv/dat_i" type="array">
+      <obj_property name="ElementShortName">dat_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dat_i[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/inphase_i" type="array">
-      <obj_property name="ElementShortName">inphase_i[15:0]</obj_property>
-      <obj_property name="ObjectShortName">inphase_i[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="radix_realType">FLOATINGPOINTRADIX</obj_property>
-      <obj_property name="radix_fractionWidth">53</obj_property>
-      <obj_property name="radix_otherWidth">11</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
+   <wvobject fp_name="/tb_myconv/coef_i" type="array">
+      <obj_property name="ElementShortName">coef_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">coef_i[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/quadrat_i" type="array">
-      <obj_property name="ElementShortName">quadrat_i[15:0]</obj_property>
-      <obj_property name="ObjectShortName">quadrat_i[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
+   <wvobject fp_name="/tb_myconv/sum_o" type="array">
+      <obj_property name="ElementShortName">sum_o[47:0]</obj_property>
+      <obj_property name="ObjectShortName">sum_o[47:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/dout_val_o" type="logic">
-      <obj_property name="ElementShortName">dout_val_o</obj_property>
-      <obj_property name="ObjectShortName">dout_val_o</obj_property>
+   <wvobject fp_name="/tb_myconv/vld_o" type="logic">
+      <obj_property name="ElementShortName">vld_o</obj_property>
+      <obj_property name="ObjectShortName">vld_o</obj_property>
    </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/mag_o" type="array">
-      <obj_property name="ElementShortName">mag_o[15:0]</obj_property>
-      <obj_property name="ObjectShortName">mag_o[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-   </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/phs_o" type="array">
-      <obj_property name="ElementShortName">phs_o[15:0]</obj_property>
-      <obj_property name="ObjectShortName">phs_o[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/IQ2Vect_tb/clk_per" type="other">
-      <obj_property name="ElementShortName">clk_per</obj_property>
-      <obj_property name="ObjectShortName">clk_per</obj_property>
+   <wvobject fp_name="/tb_myconv/clk_per_c" type="other">
+      <obj_property name="ElementShortName">clk_per_c</obj_property>
+      <obj_property name="ObjectShortName">clk_per_c</obj_property>
    </wvobject>
 </wave_config>
