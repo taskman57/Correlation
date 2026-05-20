@@ -1,60 +1,50 @@
 function [rounded_val, ovf] = myround(val, intb, frcb)
   % =========================================================================
-  % FUNCTION: myconv_round
+  % FUNCTION: myround
   % -------------------------------------------------------------------------
   % Implementation of a Hardware-Accurate Unbiased Convergent Rounding
   % (Round-to-Even) with Symmetric Saturation logic.
   %
   % STAGES:
   % 1. FIXED-POINT ALIGNMENT: Scales input to internal integer representation.
-  % 2. TIE-BREAKING LOGIC: Implements "Round-to-Even" to eliminate DC bias
-  %    accumulation inherent in standard truncation or asymmetric rounding.
-  % 3. DYNAMIC RANGE LIMITING: Performs Sign-Aware Saturation (Clipping)
-  %    to prevent Two's Complement wrap-around/phase-reversal.
-  % 4. RTL EMULATION: Provides bit-accurate output mirroring FPGA DSP
-  %    slice behavior for bit-true hardware verification.
+  % 2. TIE-BREAKING LOGIC: Implements "Round-to-Even" safely for all frcb.
+  % 3. DYNAMIC RANGE LIMITING: Performs Sign-Aware Saturation (Clipping).
+  % 4. RTL EMULATION: Scaled output matches true hardware bit-accuracy.
   % =========================================================================
-  intw = intb + frcb;
-  POS_MAX = 2^(intw-1)-1;                 % Maximum value
-  NEG_MAX = -2^(intw-1);                  % Minimum value
-  ovf = 0;
-  sign = 0;
-  val_int = val*(2^frcb);
-  rnd_val = floor(val_int);               % make an integer
-  if rnd_val <0
-    sign = 1;
-    rnd_val = mod(rnd_val, 2^(intw+sign));
-  endif
-  mask = 2^(intw+sign) - 1;
-  wrapped = bitand(rnd_val, mask);        % wrap into exact intw
 
-  rnd_val = wrapped;
-  if frcb >0
-    rm= rem(rnd_val, 2^frcb);
-    if rm == 2^(frcb-1)                   % if fractional is 0.5
-      rnd_val = bitshift(rnd_val,...      % pick integer part
-       (-1*frcb));
-      if rem(rnd_val,2)                   % if integer part is odd
-        rnd_val += 1;
-      endif
-      rnd_val = bitshift(rnd_val,frcb);   % shift bits back to the right position
-    else
-      rnd_val += 2^(frcb-1);              % add 0.5
-    endif
-  endif
-  if bitget(rnd_val, intw) != bitget(rnd_val, intw+1)
-    if sign == 0
-      rnd_val = POS_MAX;
-    else
-      rnd_val = NEG_MAX;
-    endif
+  % Calculate total word length and hardware boundaries
+  intw = intb + frcb;
+  POS_MAX = 2^(intw-1) - 1;                 % Maximum signed integer limit
+  NEG_MAX = -2^(intw-1);                    % Minimum signed integer limit
+
+  % Stage 1: Fixed-Point Alignment (Scale LSB to integer weight)
+  val_scaled = val * (2^frcb);
+
+  % Stage 2: Tie-Breaking Logic (True Convergent Round-to-Even)
+  rnd_val = round(val_scaled);              % Native round (handles >90% of cases)
+  is_tie = (abs(val_scaled - rnd_val) == 0.5); % Identify exact halfway ties (.5)
+  rnd_val(is_tie) = 2 * round(val_scaled(is_tie) / 2); % Force ties to nearest even integer
+
+  % Stage 3: Dynamic Range Limiting (Sign-Aware Saturation / Clipping)
+  ovf = zeros(size(val));                   % Vectorized overflow tracking
+
+  % Upper boundary clip
+  pos_mask = (rnd_val > POS_MAX);
+  rnd_val(pos_mask) = POS_MAX;
+  ovf(pos_mask) = 1;
+
+  % Lower boundary clip
+  neg_mask = (rnd_val < NEG_MAX);
+  rnd_val(neg_mask) = NEG_MAX;
+  ovf(neg_mask) = 1;
+
+  % Condense overflow to single flag if any element saturated
+  if any(ovf)
     ovf = 1;
   else
-    mask = bitcmp(2^frcb-1, intw);
-    rnd_val = bitand(rnd_val, mask);    % clear all fractional bits
+    ovf = 0;
   endif
 
-  rnd_val = rnd_val - ...                 % convert to negative numbers
-  (rnd_val >= 2^(intw-1)) * 2^intw;
-  rounded_val = rnd_val/2^frcb;
+  % Stage 4: Output Scaling
+  rounded_val = rnd_val / (2^frcb);
 end
