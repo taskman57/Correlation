@@ -4,7 +4,19 @@ use ieee.numeric_std.all;
 
 package radar_pkg is
 
+    constant ADC_BIT_RES_C      : integer   := 16;
+    constant FIR_LEN_C          : integer   := 50;
+    constant DSP_LATANCY_C      : integer   := 4;   -- 2 FFs before multiplier + 1 (after multiplier) + 1 (after ALU)
+    constant TIMING_COMP_C      : integer   := 1;   -- Compensate for 1-cycle pipeline delay added to break the cyc_ctr_s to OPMODE critical path
+    constant DSP_FOLD_STAGES_C  : integer   := 5;
+    constant PULSE_SAMPLES_C    : integer   := 2500;
+
     type chrp_rom_t is array(0 to 49) of signed(15 downto 0);
+    type sfr_fir_t is array(FIR_LEN_C-2 downto 0) of signed(ADC_BIT_RES_C-1 downto 0);
+    type chrp_rom_t     is array(natural range <>) of signed(ADC_BIT_RES_C-1 downto 0);
+
+    type noisy_dat_t    is array(natural range <>) of signed(ADC_BIT_RES_C-1 downto 0);
+    type fir_coef_t     is array(0 to FIR_LEN_C/2-1) of signed(ADC_BIT_RES_C-1 downto 0);
 
     -- These Inphase & quadrature values have been generated in Octave script.
     constant chrp_ampl_c : chrp_rom_t:=(
@@ -108,6 +120,150 @@ package radar_pkg is
         to_signed(-4227,16),
         to_signed(-10190,16)
     );
+
+    constant fir_coef_c     : fir_coef_t    :=(
+        to_signed(59, 16),
+        to_signed(55, 16),
+        to_signed(79, 16),
+        to_signed(108, 16),
+        to_signed(143, 16),
+        to_signed(184, 16),
+        to_signed(232, 16),
+        to_signed(285, 16),
+        to_signed(345, 16),
+        to_signed(410, 16),
+        to_signed(480, 16),
+        to_signed(553, 16),
+        to_signed(630, 16),
+        to_signed(709, 16),
+        to_signed(788, 16),
+        to_signed(866, 16),
+        to_signed(942, 16),
+        to_signed(1015, 16),
+        to_signed(1082, 16),
+        to_signed(1143, 16),
+        to_signed(1195, 16),
+        to_signed(1239, 16),
+        to_signed(1273, 16),
+        to_signed(1295, 16),
+        to_signed(1274, 16)
+    );
+
+    constant noisy_dat_c    : noisy_dat_t   :=(
+        x"FFF8",
+        x"FD19",
+        x"F4DC",
+        x"E857",
+        x"D92E",
+        x"C957",
+        x"BAD3",
+        x"AF6C",
+        x"A86C",
+        x"A675",
+        x"A96C",
+        x"B075",
+        x"BA1D",
+        x"C485",
+        x"CDAC",
+        x"D3B6",
+        x"D52F",
+        x"D13E",
+        x"C7C8",
+        x"B972",
+        x"A78C",
+        x"93DE",
+        x"8071",
+        x"6F3F",
+        x"61EF",
+        x"599D",
+        x"56AF",
+        x"58CA",
+        x"5EDF",
+        x"6750",
+        x"702E",
+        x"777D",
+        x"7B7F",
+        x"7AED",
+        x"752E",
+        x"6A66",
+        x"5B77",
+        x"49DE",
+        x"3781",
+        x"2668",
+        x"1878",
+        x"0F2E",
+        x"0B6A",
+        x"0D4E",
+        x"143D",
+        x"1EF0",
+        x"2BA4",
+        x"3859",
+        x"431B",
+        x"4A48",
+        x"4CCD",
+        x"4A48",
+        x"431B",
+        x"3859",
+        x"2BA4",
+        x"1EF0",
+        x"143D",
+        x"0D4E",
+        x"0B6A",
+        x"0F2E",
+        x"1878",
+        x"2668",
+        x"3781",
+        x"49DE",
+        x"5B77",
+        x"6A66",
+        x"752E",
+        x"7AED",
+        x"7B7F",
+        x"777D",
+        x"702E",
+        x"6750",
+        x"5EDF",
+        x"58CA",
+        x"56AF",
+        x"599D",
+        x"61EF",
+        x"6F3F",
+        x"8071",
+        x"93DE",
+        x"A78C",
+        x"B972",
+        x"C7C8",
+        x"D13E",
+        x"D52F",
+        x"D3B6",
+        x"CDAC",
+        x"C485",
+        x"BA1D",
+        x"B075",
+        x"A96C",
+        x"A675",
+        x"A86C",
+        x"AF6C",
+        x"BAD3",
+        x"C957",
+        x"D92E",
+        x"E857",
+        x"F4DC",
+        x"FD19"
+    );
+
+    constant DSP_AINP_LEN_C     : integer   := 30;
+    constant DSP_BINP_LEN_C     : integer   := 18;
+    constant DSP_CINP_LEN_C     : integer   := 48;
+    constant DSP_POUT_LEN_C     : integer   := 48;
+    constant DSP_DINP_LEN_C     : integer   := 25;
+
+    type ainp_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(DSP_AINP_LEN_C - 1 downto 0);
+    type binp_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(DSP_BINP_LEN_C - 1 downto 0);
+    type pcin_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(DSP_CINP_LEN_C - 1 downto 0);
+    type pout_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(DSP_POUT_LEN_C - 1 downto 0);
+    type dinp_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(DSP_DINP_LEN_C - 1 downto 0);
+    type dsp_mode_t is array(0 to DSP_FOLD_STAGES_C - 1) of std_logic_vector(06 downto 0);
 
     -- This function rounds fix-point numbers to even(convergent rounding)
     function conv_round(a: in std_logic_vector; frc_len: in integer) return std_logic_vector;
