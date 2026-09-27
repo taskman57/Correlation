@@ -2025,7 +2025,7 @@ package ref_adc_pkg is
     x"FD88", x"0CCA", x"BFDE", x"0458", x"00D3", x"0934", x"C817", x"0AF2", x"FC0A", x"00E0", 
     x"EBBB", x"252F", x"05BC", x"2298", x"EAC0", x"0DE5", x"0AE6", x"DAF9", x"1A66", x"FF5A", 
     x"F14C", x"084A", x"0714", x"FF07", x"F069", x"08B6", x"F92F", x"01B1", x"1EB0", x"D83E", 
-    x"F73B", x"E68D", x"F6A1", x"263E", x"FC36", x"0790", x"F22F", x"13FA", x"099D", x"E387"),
+    x"F73B", x"E68D", x"F6A1", x"263E", x"FC36", x"0790", x"F22F", x"13FA", x"099D", x"E387")
     );
 
 

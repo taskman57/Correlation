@@ -13,7 +13,7 @@ entity fir_impl is
         clk_ena_i       : in std_logic;
         cyc_ctr_i       : in integer range 0 to DSP_FOLD_STAGES_C-1;
         data_i          : in std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-        coef_i          : in fir_coef_t;
+        coef_i          : in chrp_rom_t;
         fir_res_o       : out std_logic_vector(15 downto 0);
         fir_vld_o       : out std_logic
     );

@@ -59,8 +59,8 @@ architecture Behavioral of range_detector is
     signal fir_pha_vld_s    : std_logic;
 
     -- synthesis translate_off
-    file fir_file_amp       : text open write_mode is "../../../../../rtl_sim/fir_amp_LP50.dat";
-    file fir_file_pha       : text open write_mode is "../../../../../rtl_sim/fir_pha_LP50.dat";
+    file fir_file_amp       : text open write_mode is "../../../../../rtl_sim/matched_filter_amp.dat";
+    file fir_file_pha       : text open write_mode is "../../../../../rtl_sim/matched_filter_pha.dat";
     -- synthesis translate_on
 
 begin
@@ -69,8 +69,8 @@ begin
     clk_dsp_inst : entity work.clk_dsp
     port map (
         -- Clock out ports  
-        clk_out1        => dsp_clk_s,
-        clk_out2        => sys_clk_s,
+        clk_out1        => dsp_clk_s,   -- 250 MHz
+        clk_out2        => sys_clk_s,   -- 50 MHz
         -- Status and control signals
         reset           => '0',
         locked          => clk_lck_s,
@@ -137,7 +137,7 @@ begin
         empty       => pha_fif_emp_s
     );
 
-    process(sys_clk_s)
+    process(sys_clk_s, sys_rst_s)
     begin
         if sys_rst_s = '1' then
             fifo_rst_s      <= '1';
@@ -178,7 +178,7 @@ begin
         clk_ena_i       => amp_fifo_en_s,
         cyc_ctr_i       => cyc_ctr_s,
         data_i          => amp_fifo_dat_s,
-        coef_i          => fir_coef_c,
+        coef_i          => chrp_ampl_c,
         fir_res_o       => fir_amp_s,
         fir_vld_o       => fir_amp_vld_s
     );
@@ -190,7 +190,7 @@ begin
         clk_ena_i       => amp_fifo_en_s,
         cyc_ctr_i       => cyc_ctr_s,
         data_i          => pha_fifo_dat_s,
-        coef_i          => fir_coef_c,
+        coef_i          => chrp_phs_c,
         fir_res_o       => fir_pha_s,
         fir_vld_o       => fir_pha_vld_s
     );

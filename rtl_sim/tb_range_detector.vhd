@@ -7,7 +7,7 @@ use work.ref_adc_pkg.all;
 
 
 entity tb_range_detector is
-    generic(SIM_LP_FILTER   : boolean := true);
+    generic(SIM_LP_FILTER   : boolean := false);
 end tb_range_detector;
 
 architecture sim of tb_range_detector is
@@ -65,7 +65,7 @@ begin
         variable stu_dly_v      : integer range 0 to 100-1:=0;
         variable amp_ctr_v      : integer range 0 to 2500-1:=0;
         variable pha_ctr_v      : integer range 0 to 2500-1:=0;
-        variable p_num_v        : integer range 0 to adc_real_c'length-1:=0;
+        variable p_num_v        : integer range 0 to adc_real_c'length-1:=0;    -- Np in Correlation script 
     begin
         if rising_edge(adc_clk_i) then
             if rst_i = '1' then
