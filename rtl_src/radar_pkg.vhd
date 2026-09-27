@@ -11,7 +11,6 @@ package radar_pkg is
     constant DSP_FOLD_STAGES_C  : integer   := 5;
     constant PULSE_SAMPLES_C    : integer   := 2500;
 
-    type chrp_rom_t is array(0 to 49) of signed(15 downto 0);
     type sfr_fir_t is array(FIR_LEN_C-2 downto 0) of signed(ADC_BIT_RES_C-1 downto 0);
     type chrp_rom_t     is array(natural range <>) of signed(ADC_BIT_RES_C-1 downto 0);
 

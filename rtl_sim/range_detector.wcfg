@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_range_detector_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="radar_pkg" />
+            <top_module name="ref_adc_pkg" />
+            <top_module name="tb_range_detector" />
+            <top_module name="vcomponents" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="30.000000 us"></ZoomEndTime>
+      <Cursor1Time time="30.000000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="126"></NameColumnWidth>
+      <ValueColumnWidth column_width="173"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="/tb_range_detector/clk_p" type="logic">
+      <obj_property name="ElementShortName">clk_p</obj_property>
+      <obj_property name="ObjectShortName">clk_p</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/clk_n" type="logic">
+      <obj_property name="ElementShortName">clk_n</obj_property>
+      <obj_property name="ObjectShortName">clk_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/rst_i" type="logic">
+      <obj_property name="ElementShortName">rst_i</obj_property>
+      <obj_property name="ObjectShortName">rst_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/adc_clk_i" type="logic">
+      <obj_property name="ElementShortName">adc_clk_i</obj_property>
+      <obj_property name="ObjectShortName">adc_clk_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/adc_vld_i" type="logic">
+      <obj_property name="ElementShortName">adc_vld_i</obj_property>
+      <obj_property name="ObjectShortName">adc_vld_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/adc_amp_s" type="array">
+      <obj_property name="ElementShortName">adc_amp_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_amp_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/adc_amp_i" type="array">
+      <obj_property name="ElementShortName">adc_amp_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_amp_i[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/pulse_i" type="logic">
+      <obj_property name="ElementShortName">pulse_i</obj_property>
+      <obj_property name="ObjectShortName">pulse_i</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider16">
+      <obj_property name="label">Filter_out</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/fir_vld_s" type="logic">
+      <obj_property name="ElementShortName">fir_vld_s</obj_property>
+      <obj_property name="ObjectShortName">fir_vld_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/fir_res_s" type="array">
+      <obj_property name="ElementShortName">fir_res_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fir_res_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+</wave_config>
