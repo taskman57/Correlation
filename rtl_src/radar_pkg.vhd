@@ -16,7 +16,6 @@ package radar_pkg is
 
     type noisy_dat_t    is array(natural range <>) of signed(ADC_BIT_RES_C-1 downto 0);
     type fir_coef_t     is array(0 to FIR_LEN_C/2-1) of signed(ADC_BIT_RES_C-1 downto 0);
-
     -- These Inphase & quadrature values have been generated in Octave script.
     constant chrp_ampl_c : chrp_rom_t:=(
         x"F14A",

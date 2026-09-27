@@ -18,7 +18,7 @@ entity range_detector is
         adc_clk_i       : in std_logic;
         adc_vld_i       : in std_logic;
         adc_amp_i       : in std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-        -- adc_pha_i       : in std_logic_vector(15 downto 0);
+        adc_pha_i       : in std_logic_vector(ADC_BIT_RES_C-1 downto 0);
         pulse_i         : in std_logic;
 
         --  processing results
@@ -40,10 +40,14 @@ architecture Behavioral of range_detector is
     signal fifo_rst_syn_s   : std_logic;
     signal fifo_rst_s       : std_logic;
 
-    signal adc_fif_emp_s    : std_logic;
-    signal adc_fif_ren_s    : std_logic;
-    signal adc_amp_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-    signal fir_res_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal amp_fif_emp_s    : std_logic;
+    signal pha_fif_emp_s    : std_logic;
+    signal amp_fifo_en_s    : std_logic;
+    signal amp_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal pha_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal adc_pha_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal fir_amp_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal fir_pha_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
 
     signal low_lev_s        : std_logic;
     signal mid_lev_s        : std_logic;
@@ -51,10 +55,12 @@ architecture Behavioral of range_detector is
 
     signal cyc_ctr_s        : integer range 0 to DSP_FOLD_STAGES_C - 1:=4;
 
-    signal fir_vld_s        : std_logic;
+    signal fir_amp_vld_s    : std_logic;
+    signal fir_pha_vld_s    : std_logic;
 
     -- synthesis translate_off
-    file rtl_dsp_fir        : text open write_mode is "../../../../../rtl_sim/output_results_LP50.dat";
+    file fir_file_amp       : text open write_mode is "../../../../../rtl_sim/fir_amp_LP50.dat";
+    file fir_file_pha       : text open write_mode is "../../../../../rtl_sim/fir_pha_LP50.dat";
     -- synthesis translate_on
 
 begin
@@ -113,11 +119,24 @@ begin
         rd_clk      => dsp_clk_s,
         din         => adc_amp_i,
         wr_en       => adc_vld_i,
-        rd_en       => adc_fif_ren_s,
-        dout        => adc_amp_s,
+        rd_en       => amp_fifo_en_s,
+        dout        => amp_fifo_dat_s,
         full        => open,
-        empty       => adc_fif_emp_s
+        empty       => amp_fif_emp_s
     );
+    adc_pha_inst : entity work.adc_fifo
+    PORT MAP (
+        rst         => fifo_rst_s,
+        wr_clk      => adc_clk_i,
+        rd_clk      => dsp_clk_s,
+        din         => adc_pha_i,
+        wr_en       => adc_vld_i,
+        rd_en       => amp_fifo_en_s,
+        dout        => pha_fifo_dat_s,
+        full        => open,
+        empty       => pha_fif_emp_s
+    );
+
     process(sys_clk_s)
     begin
         if sys_rst_s = '1' then
@@ -133,15 +152,15 @@ begin
     begin
         if rising_edge(dsp_clk_s) then
             if dsp_rst_s = '1' then
-                adc_fif_ren_s       <= '0';
+                amp_fifo_en_s       <= '0';
                 cyc_ctr_s           <= 4;
                 fir_rst_s           <= '1';
             else
-                adc_fif_ren_s       <= '0';
-                if adc_fif_emp_s = '0' then
+                amp_fifo_en_s       <= '0';
+                if amp_fif_emp_s = '0' then
                     fir_rst_s       <= '0';
                     if cyc_ctr_s = 4 then
-                        adc_fif_ren_s   <= '1';
+                        amp_fifo_en_s   <= '1';
                         cyc_ctr_s       <= 0;
                     end if;
                 end if;
@@ -151,28 +170,48 @@ begin
             end if;
         end if;
     end process;
+
     fir_amp_inst: entity work.fir_impl
     Port map( 
         clk_i           => dsp_clk_s,
         rst_i           => fir_rst_s,
-        clk_ena_i       => adc_fif_ren_s,
+        clk_ena_i       => amp_fifo_en_s,
         cyc_ctr_i       => cyc_ctr_s,
-        data_i          => adc_amp_s,
+        data_i          => amp_fifo_dat_s,
         coef_i          => fir_coef_c,
-        fir_res_o       => fir_res_s,
-        fir_vld_o       => fir_vld_s
+        fir_res_o       => fir_amp_s,
+        fir_vld_o       => fir_amp_vld_s
     );
-    obj_det_o   <= fir_vld_s;
+
+    fir_pha_inst: entity work.fir_impl
+    Port map( 
+        clk_i           => dsp_clk_s,
+        rst_i           => fir_rst_s,
+        clk_ena_i       => amp_fifo_en_s,
+        cyc_ctr_i       => cyc_ctr_s,
+        data_i          => pha_fifo_dat_s,
+        coef_i          => fir_coef_c,
+        fir_res_o       => fir_pha_s,
+        fir_vld_o       => fir_pha_vld_s
+    );
+
+    obj_det_o   <= fir_amp_vld_s and fir_pha_vld_s;
 
 -- synthesis translate_off
     stimulus: process(dsp_clk_s)
-        variable lin_v  : line;
+        variable lin_amp_v  : line;
+        variable lin_pha_v  : line;
     begin
         if rising_edge(dsp_clk_s) then
-            if fir_vld_s = '1' and adc_fif_ren_s = '1' then
-                report "Writing FIR result";
-                hwrite(lin_v, fir_res_s);
-                writeline(rtl_dsp_fir, lin_v);
+            if fir_amp_vld_s = '1' and amp_fifo_en_s = '1' then
+                report "Writing amplitude FIR result";
+                hwrite(lin_amp_v, fir_amp_s);
+                writeline(fir_file_amp, lin_amp_v);
+            end if;
+            if fir_pha_vld_s = '1' and amp_fifo_en_s = '1' then
+                report "Writing phase FIR result";
+                hwrite(lin_pha_v, fir_pha_s);
+                writeline(fir_file_pha, lin_pha_v);
             end if;
         end if;
     end process;
@@ -187,15 +226,15 @@ begin
                 mid_lev_s   <= '0';
                 hig_lev_s   <= '0';
             else
-                if unsigned(fir_res_s) < 2**13-1 then
+                if unsigned(fir_amp_s) < 2**13-1 then
                     low_lev_s   <= '1';
                     mid_lev_s   <= '0';
                     hig_lev_s   <= '0';
-                elsif unsigned(fir_res_s) > 2**13-1 and unsigned(fir_res_s) < 2**14-1 then
+                elsif unsigned(fir_amp_s) > 2**13-1 and unsigned(fir_pha_s) < 2**14-1 then
                     low_lev_s   <= '0';
                     mid_lev_s   <= '1';
                     hig_lev_s   <= '0';
-                elsif unsigned(fir_res_s) > 2**14-1 then
+                elsif unsigned(fir_pha_s) > 2**14-1 then
                     low_lev_s   <= '0';
                     mid_lev_s   <= '0';
                     hig_lev_s   <= '1';
