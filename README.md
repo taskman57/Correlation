@@ -14,7 +14,9 @@ Correlation/
 │   └── range_detector.xdc        # 250 MHz clock definition and CDC path constraints
 ├── docs/                         # Hardware verification snapshots and documentation
 │   ├── Firt_matched_filter.png   # Single-channel matched filter waveform snapshot
-│   └── IQ_match_filter.png       # Dual-channel (I/Q) matched filter waveform snapshot
+│   ├── IQ_match_filter.png       # Dual-channel (I/Q) matched filter waveform snapshot
+│   ├── tx_noisy_rx_pulses.png    # Octave simulation: Transmitted and noisy RX pulses
+│   └── detected_range.png        # Octave simulation: Coherent integration range detection
 ├── ipcores/                      # AMD/Xilinx IP core definitions
 │   ├── adc_fifo/                 # Dual-clock asynchronous CDC FIFO
 │   ├── clk_dsp/                  # Clocking Wizard generating 250 MHz DSP clock
@@ -57,6 +59,25 @@ The `m_files/` directory contains system-level scripts used to design, quantize,
 3. **Bit-True Rounding Models (`myround.m` & `my_comp_round.m`):** Implements convergent rounding (round-to-even) and complex rounding models to eliminate DC bias during bit-width reduction.
 4. **Golden Vector Dataset (`golden_ref_vector.dat`):** Exported test vector dataset used to populate `rtl_sim/rtl_golden_ref_vector.vhd` for self-checking VHDL simulation.
 
+### Simulation & Golden Vector Workflow
+The correlation simulation is controlled via `Correlation(act_prnt, new_test_vector)` in Octave/MATLAB:
+
+* **Debugging & Printing (`act_prnt`):** Set to `1` to enable verbose console debugging and dump VHDL-ready ROM arrays (`chrp_ampl_c`, `chrp_phs_c`, `inph_c`, `quadr_c`).
+* **Vector Generation (`new_test_vector`):**
+  * `Correlation(0, 1)`: Generates a new stochastic noisy RX signal package and writes updated reference files (`golden_ref_vector.m` for Octave and `rtl_golden_ref_vector.vhd` for the Vivado RTL testbench).
+  * `Correlation(0, 0)`: Loads the static baseline vector set. Running this mode guarantees that Octave and RTL simulations operate on an identical, unified test dataset for strict bit-true correlation verification.
+
+> **Note:** A pre-generated golden vector file (`rtl_sim/rtl_golden_ref_vector.vhd`) is provided in the repository as the default baseline reference.
+
+### Simulation & Theoretical Limits
+The following snapshots demonstrate the Octave simulation results, establishing the theoretical baseline for the RTL implementation:
+
+![Transmitted and Noisy RX Pulses](docs/tx_noisy_rx_pulses.png)
+*Transmitted chirp and deeply embedded noisy RX signal (SNR = -30.25dB).*
+
+![Coherent Integration and Range Detection](docs/detected_range.png)
+*Matched filter output showcasing successful pulse compression and coherent integration gain.*
+
 ---
 
 ## Hardware Architecture & Verification
@@ -70,12 +91,12 @@ The `m_files/` directory contains system-level scripts used to design, quantize,
 ### 2. Waveform Verification
 
 #### Single-Channel Baseline Verification
-Functional baseline validation for the single-channel folded FIR engine (`docs/Firt_matched_filter.png`):
+Functional baseline validation for the single-channel folded FIR engine:
 
 ![Single-Channel Matched Filter Waveform Output](docs/Firt_matched_filter.png)
 
 #### Dual-Channel Quadrature (I/Q) Verification
-Parallel channel output validation for In-Phase and Quadrature paths (`fir_amp_s` and `fir_pha_s`) (`docs/IQ_match_filter.png`) against the Octave golden reference vector package (`rtl_golden_ref_vector.vhd`):
+Parallel channel output validation for In-Phase and Quadrature paths (`fir_amp_s` and `fir_pha_s`) against the Octave golden reference vector package (`rtl_golden_ref_vector.vhd`):
 
 ![Quadrature Matched Filter Waveform Output](docs/IQ_match_filter.png)
 
