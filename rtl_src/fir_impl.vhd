@@ -14,6 +14,7 @@ entity fir_impl is
         cyc_ctr_i       : in integer range 0 to DSP_FOLD_STAGES_C-1;
         data_i          : in std_logic_vector(ADC_BIT_RES_C-1 downto 0);
         coef_i          : in chrp_rom_t;
+        rdclk_i         : in std_logic;
         fir_res_o       : out std_logic_vector(15 downto 0);
         fir_vld_o       : out std_logic
     );
@@ -21,6 +22,7 @@ end fir_impl;
 
 architecture Behavioral of fir_impl is
 
+    constant REG_OUT_STAGE_C    : integer := 2;
     attribute shreg_extract : string;
     attribute srl_style     : string;
 
@@ -40,6 +42,10 @@ architecture Behavioral of fir_impl is
     signal prod_res_s       : pcin_t    := (others => (others => '0'));
     signal dsp_dinp_s       : dinp_t    := (others => (others => '0'));
 
+    signal reg_out_s        : std_logic_vector(31 downto 0);
+    signal data_rdclk_s     : std_logic_vector(31 downto 0);
+    signal fir_vld_s        : std_logic;
+
 begin
 
     OUT_VLD_PROC: process(clk_i)
@@ -48,12 +54,12 @@ begin
         if rising_edge(clk_i) then
             if rst_i = '1' then
                 dly_ctr_v           := 0;
-                fir_vld_o           <= '0';
+                fir_vld_s           <= '0';
             else
-                if dly_ctr_v < (FIR_LEN_C/2 + DSP_LATANCY_C) - 1 then
+                if dly_ctr_v < (FIR_LEN_C/2 + DSP_LATANCY_C + 5*REG_OUT_STAGE_C) - 1 then
                     dly_ctr_v   := dly_ctr_v + 1;
                 else
-                    fir_vld_o   <= '1';
+                    fir_vld_s   <= '1';
                 end if;
             end if;
         end if;
@@ -125,17 +131,28 @@ begin
         );
     end generate;
 
-    process(clk_i)
+    reg_fir_proc: process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i = '1' then
-                fir_res_o       <= (others => '0');
+                reg_out_s       <= (others => '0');
             else
                 if cyc_ctr_i = 3 then
-                    fir_res_o       <= dsp_pout_s(DSP_FOLD_STAGES_C-1)(31 downto 16);     -- MSB determined based on simulation results
+                    reg_out_s   <= dsp_pout_s(DSP_FOLD_STAGES_C-1)(31 downto 0);    -- MSB determined from octave script
                 end if;
             end if;
         end if;
-    end process;
+    end process reg_fir_proc;
+
+    round_out_proc: process(rdclk_i)
+        variable round_fir_v    : std_logic_vector(32 downto 0);
+    begin
+        if rising_edge(rdclk_i) then
+            data_rdclk_s    <= reg_out_s;
+            round_fir_v     := conv_round(data_rdclk_s, 16);
+            fir_res_o       <= round_fir_v(31 downto 16);
+            fir_vld_o       <= fir_vld_s;
+        end if;
+    end process round_out_proc;
 
 end Behavioral;

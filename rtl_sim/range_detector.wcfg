@@ -15,14 +15,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="30.000001 us"></ZoomEndTime>
-      <Cursor1Time time="30.000000 us"></Cursor1Time>
+      <ZoomEndTime time="11.000000 us"></ZoomEndTime>
+      <Cursor1Time time="11.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="126"></NameColumnWidth>
-      <ValueColumnWidth column_width="169"></ValueColumnWidth>
+      <ValueColumnWidth column_width="157"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="12" />
+   <WVObjectSize size="14" />
    <wvobject fp_name="/tb_range_detector/clk_p" type="logic">
       <obj_property name="ElementShortName">clk_p</obj_property>
       <obj_property name="ObjectShortName">clk_p</obj_property>
@@ -83,17 +83,25 @@
       <obj_property name="ObjectShortName">fir_amp_s[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
       <obj_property name="CustomSignalColor">#FFA500</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_range_detector/dut/fir_pha_s" type="array">
       <obj_property name="ElementShortName">fir_pha_s[15:0]</obj_property>
       <obj_property name="ObjectShortName">fir_pha_s[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
       <obj_property name="CustomSignalColor">#FFA500</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/sys_clk_s" type="logic">
+      <obj_property name="ElementShortName">sys_clk_s</obj_property>
+      <obj_property name="ObjectShortName">sys_clk_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/cyc_ctr_s" type="other">
+      <obj_property name="ElementShortName">cyc_ctr_s</obj_property>
+      <obj_property name="ObjectShortName">cyc_ctr_s</obj_property>
    </wvobject>
 </wave_config>

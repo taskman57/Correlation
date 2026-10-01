@@ -104,13 +104,13 @@ begin
                             amp_ctr_v       := amp_ctr_v + 1;
                             pha_ctr_v       := pha_ctr_v + 1;
                         else
-                            if p_num_v < adc_real_c'length-1 then
-                                amp_ctr_v   := 0;
-                                pha_ctr_v   := 0;
-                                p_num_v     := p_num_v + 1;
-                            else
+                            -- if p_num_v < adc_real_c'length-1 then
+                                -- amp_ctr_v   := 0;
+                                -- pha_ctr_v   := 0;
+                                -- p_num_v     := p_num_v + 1;
+                            -- else
                                 adc_vld_i   <= '0';
-                            end if;
+                            -- end if;
                         end if;
                     end if;
                 end if;

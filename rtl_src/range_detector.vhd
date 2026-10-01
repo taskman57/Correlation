@@ -174,6 +174,7 @@ begin
     fir_amp_inst: entity work.fir_impl
     Port map( 
         clk_i           => dsp_clk_s,
+        rdclk_i         => sys_clk_s,
         rst_i           => fir_rst_s,
         clk_ena_i       => amp_fifo_en_s,
         cyc_ctr_i       => cyc_ctr_s,
@@ -186,6 +187,7 @@ begin
     fir_pha_inst: entity work.fir_impl
     Port map( 
         clk_i           => dsp_clk_s,
+        rdclk_i         => sys_clk_s,
         rst_i           => fir_rst_s,
         clk_ena_i       => amp_fifo_en_s,
         cyc_ctr_i       => cyc_ctr_s,
@@ -198,17 +200,17 @@ begin
     obj_det_o   <= fir_amp_vld_s and fir_pha_vld_s;
 
 -- synthesis translate_off
-    stimulus: process(dsp_clk_s)
+    stimulus: process(sys_clk_s)
         variable lin_amp_v  : line;
         variable lin_pha_v  : line;
     begin
-        if rising_edge(dsp_clk_s) then
-            if fir_amp_vld_s = '1' and amp_fifo_en_s = '1' then
+        if rising_edge(sys_clk_s) then
+            if fir_amp_vld_s = '1' then
                 report "Writing amplitude FIR result";
                 hwrite(lin_amp_v, fir_amp_s);
                 writeline(fir_file_amp, lin_amp_v);
             end if;
-            if fir_pha_vld_s = '1' and amp_fifo_en_s = '1' then
+            if fir_pha_vld_s = '1' then
                 report "Writing phase FIR result";
                 hwrite(lin_pha_v, fir_pha_s);
                 writeline(fir_file_pha, lin_pha_v);
@@ -218,10 +220,10 @@ begin
 -- synthesis translate_on
 
     just_4_test:
-    process(dsp_clk_s)
+    process(sys_clk_s)
     begin
-        if rising_edge(dsp_clk_s) then
-            if dsp_rst_s = '1' then
+        if rising_edge(sys_clk_s) then
+            if sys_rst_s = '1' then
                 low_lev_s   <= '0';
                 mid_lev_s   <= '0';
                 hig_lev_s   <= '0';
@@ -239,56 +241,11 @@ begin
                     mid_lev_s   <= '0';
                     hig_lev_s   <= '1';
                 end if;
+                low_lev_o       <= low_lev_s;
+                mid_lev_o       <= mid_lev_s;
+                hig_lev_o       <= hig_lev_s;
             end if;
         end if;
     end process;
-
-   low_xpm_cdc_single_inst : xpm_cdc_single
-   generic map (
-        DEST_SYNC_FF => 4,      -- DECIMAL; range: 2-10
-        INIT_SYNC_FF => 0,      -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
-        SIM_ASSERT_CHK => 0,    -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
-        SRC_INPUT_REG => 1      -- DECIMAL; 0=do not register input, 1=register input
-   )
-   port map (
-        dest_out => low_lev_o,  -- 1-bit output: src_in synchronized to the destination clock domain. This output
-                                -- is registered.
-
-        dest_clk => sys_clk_s,  -- 1-bit input: Clock signal for the destination clock domain.
-        src_clk => dsp_clk_s,   -- 1-bit input: optional; required when SRC_INPUT_REG = 1
-        src_in => low_lev_s     -- 1-bit input: Input signal to be synchronized to dest_clk domain.
-   );
-
-   mid_xpm_cdc_single_inst : xpm_cdc_single
-   generic map (
-        DEST_SYNC_FF => 4,      -- DECIMAL; range: 2-10
-        INIT_SYNC_FF => 0,      -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
-        SIM_ASSERT_CHK => 0,    -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
-        SRC_INPUT_REG => 1      -- DECIMAL; 0=do not register input, 1=register input
-   )
-   port map (
-        dest_out => mid_lev_o,  -- 1-bit output: src_in synchronized to the destination clock domain. This output
-                                -- is registered.
-
-        dest_clk => sys_clk_s,  -- 1-bit input: Clock signal for the destination clock domain.
-        src_clk => dsp_clk_s,   -- 1-bit input: optional; required when SRC_INPUT_REG = 1
-        src_in => mid_lev_s     -- 1-bit input: Input signal to be synchronized to dest_clk domain.
-   );
-
-   hig_xpm_cdc_single_inst : xpm_cdc_single
-   generic map (
-        DEST_SYNC_FF => 4,      -- DECIMAL; range: 2-10
-        INIT_SYNC_FF => 0,      -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
-        SIM_ASSERT_CHK => 0,    -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
-        SRC_INPUT_REG => 1      -- DECIMAL; 0=do not register input, 1=register input
-   )
-   port map (
-        dest_out => hig_lev_o,  -- 1-bit output: src_in synchronized to the destination clock domain. This output
-                                -- is registered.
-
-        dest_clk => sys_clk_s,  -- 1-bit input: Clock signal for the destination clock domain.
-        src_clk => dsp_clk_s,   -- 1-bit input: optional; required when SRC_INPUT_REG = 1
-        src_in => hig_lev_s     -- 1-bit input: Input signal to be synchronized to dest_clk domain.
-   );
 
 end Behavioral;
