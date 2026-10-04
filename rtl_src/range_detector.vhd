@@ -40,12 +40,15 @@ architecture Behavioral of range_detector is
     signal fifo_rst_syn_s   : std_logic;
     signal fifo_rst_s       : std_logic;
 
+    signal adc_vld_s        : std_logic;
     signal amp_fif_emp_s    : std_logic;
     signal pha_fif_emp_s    : std_logic;
     signal amp_fifo_en_s    : std_logic;
+
+    signal adc_amp_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal adc_pha_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal amp_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal pha_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-    signal adc_pha_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal fir_ampl_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal fir_phas_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
 
@@ -73,7 +76,7 @@ architecture Behavioral of range_detector is
 
     signal fir_amp_vld_s    : std_logic;
     signal fir_pha_vld_s    : std_logic;
-    signal log_samples      : std_logic;
+    signal log_samples      : std_logic_vector(3 downto 0);
 
     -- synthesis translate_off
     file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/quant_complex_convolution.dat";
@@ -128,25 +131,45 @@ begin
         src_arst        => rst_i            -- 1-bit input: Source asynchronous reset signal.
     );
 
-    adc_amp_inst : entity work.adc_fifo
+    -- RX blanking: switching duplexer between TX/RX, when TX ADC value must be cleared
+    rx_blanking_proc: process(adc_clk_i)
+        variable blank_ctr_v    : integer range 0 to 50-1 := 0;
+    begin
+        if rising_edge(adc_clk_i) then
+            adc_amp_s   <= adc_amp_i;
+            adc_pha_s   <= adc_pha_i;
+            if pulse_i = '1' then
+                blank_ctr_v := 0;
+                adc_amp_s   <= (others => '0');
+                adc_pha_s   <= (others => '0');
+            elsif blank_ctr_v < 50-1 then
+                blank_ctr_v := blank_ctr_v + 1;
+                adc_amp_s   <= (others => '0');
+                adc_pha_s   <= (others => '0');
+            end if;
+            adc_vld_s   <= adc_vld_i;
+        end if;
+    end process;
+
+    adc_real_inst : entity work.adc_fifo
     PORT MAP (
         rst         => fifo_rst_s,
         wr_clk      => adc_clk_i,
         rd_clk      => dsp_clk_s,
-        din         => adc_amp_i,
-        wr_en       => adc_vld_i,
+        din         => adc_amp_s,
+        wr_en       => adc_vld_s,
         rd_en       => amp_fifo_en_s,
         dout        => amp_fifo_dat_s,
         full        => open,
         empty       => amp_fif_emp_s
     );
-    adc_pha_inst : entity work.adc_fifo
+    adc_imag_inst : entity work.adc_fifo
     PORT MAP (
         rst         => fifo_rst_s,
         wr_clk      => adc_clk_i,
         rd_clk      => dsp_clk_s,
-        din         => adc_pha_i,
-        wr_en       => adc_vld_i,
+        din         => adc_pha_s,
+        wr_en       => adc_vld_s,
         rd_en       => amp_fifo_en_s,
         dout        => pha_fifo_dat_s,
         full        => open,
@@ -244,14 +267,12 @@ begin
     begin
         if rising_edge(sys_clk_s) then
 
-            log_samples     <= fir_II_vld_s;
+            log_samples     <= log_samples(log_samples'left-1 downto 0) & fir_II_vld_s;
             -- complex convolution real and imaginary part
             cmp_conv_amp_s  <= std_logic_vector(resize(signed(fir_II_s), fir_II_s'length+1) - resize(signed(fir_QQ_s), fir_QQ_s'length+1));
             cmp_conv_img_s  <= std_logic_vector(resize(signed(fir_IQ_s), fir_IQ_s'length+1) + resize(signed(fir_QI_s), fir_QI_s'length+1));
 
             -- convergent rounding to the nearest even
-            -- fir_amp_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_amp_s), 1), cmp_conv_amp_s'length-1)), 16);
-            -- fir_pha_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_img_s), 1), cmp_conv_img_s'length-1)), 16);
             fir_amp_long_s  <= conv_round(std_logic_vector(signed(cmp_conv_amp_s(cmp_conv_amp_s'left-1 downto 0))), 16);
             fir_pha_long_s  <= conv_round(std_logic_vector(signed(cmp_conv_img_s(cmp_conv_img_s'left-1 downto 0))), 16);
 
@@ -269,7 +290,7 @@ begin
         variable lin_compx_v  : line;
     begin
         if rising_edge(sys_clk_s) then
-            if log_samples = '1' then
+            if log_samples(2) = '1' then
                 report "Writing amplitude FIR result";
                 -- write(lin_compx_v, to_hex(cmp_conv_amp_s));
                 -- write(lin_compx_v, to_integer(signed(cmp_conv_amp_s)));
