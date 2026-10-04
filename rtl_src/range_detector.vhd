@@ -76,7 +76,7 @@ architecture Behavioral of range_detector is
     signal log_samples      : std_logic;
 
     -- synthesis translate_off
-    file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/complex_convolution.dat";
+    file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/quant_complex_convolution.dat";
     -- synthesis translate_on
 
 begin
@@ -250,8 +250,10 @@ begin
             cmp_conv_img_s  <= std_logic_vector(resize(signed(fir_IQ_s), fir_IQ_s'length+1) + resize(signed(fir_QI_s), fir_QI_s'length+1));
 
             -- convergent rounding to the nearest even
-            fir_amp_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_amp_s), 1), cmp_conv_amp_s'length-1)), 16);
-            fir_pha_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_img_s), 1), cmp_conv_img_s'length-1)), 16);
+            -- fir_amp_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_amp_s), 1), cmp_conv_amp_s'length-1)), 16);
+            -- fir_pha_long_s  <= conv_round(std_logic_vector(resize(shift_right(signed(cmp_conv_img_s), 1), cmp_conv_img_s'length-1)), 16);
+            fir_amp_long_s  <= conv_round(std_logic_vector(signed(cmp_conv_amp_s(cmp_conv_amp_s'left-1 downto 0))), 16);
+            fir_pha_long_s  <= conv_round(std_logic_vector(signed(cmp_conv_img_s(cmp_conv_img_s'left-1 downto 0))), 16);
 
             fir_ampl_s      <= fir_amp_long_s(31 downto 16);
             fir_phas_s      <= fir_pha_long_s(31 downto 16);
@@ -270,12 +272,14 @@ begin
             if log_samples = '1' then
                 report "Writing amplitude FIR result";
                 -- write(lin_compx_v, to_hex(cmp_conv_amp_s));
-                write(lin_compx_v, to_integer(signed(cmp_conv_amp_s)));
+                -- write(lin_compx_v, to_integer(signed(cmp_conv_amp_s)));
+                write(lin_compx_v, to_integer(signed(fir_ampl_s)));
 
                 write(lin_compx_v, string'(" "));
 
                 -- write(lin_compx_v, to_hex(cmp_conv_img_s));
-                write(lin_compx_v, to_integer(signed(cmp_conv_img_s)));
+                -- write(lin_compx_v, to_integer(signed(cmp_conv_img_s)));
+                write(lin_compx_v, to_integer(signed(fir_phas_s)));
 
                 writeline(cmpx_conv_file, lin_compx_v);
             end if;

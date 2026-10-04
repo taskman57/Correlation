@@ -14,15 +14,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,060.863 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,303.011 ns"></ZoomEndTime>
-      <Cursor1Time time="2,126.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="55.000001 us"></ZoomEndTime>
+      <Cursor1Time time="2.310000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="209"></NameColumnWidth>
+      <NameColumnWidth column_width="201"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
+   <WVObjectSize size="21" />
+   <wave_markers>
+      <marker time="52070000" label="" />
+      <marker time="2090000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_range_detector/clk_p" type="logic">
       <obj_property name="ElementShortName">clk_p</obj_property>
       <obj_property name="ObjectShortName">clk_p</obj_property>
@@ -76,22 +80,6 @@
       <obj_property name="label">Filter_out</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_amp_s" type="array">
-      <obj_property name="ElementShortName">fir_amp_s[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_amp_s[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_pha_s" type="array">
-      <obj_property name="ElementShortName">fir_pha_s[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_pha_s[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_range_detector/dut/sys_clk_s" type="logic">
       <obj_property name="ElementShortName">sys_clk_s</obj_property>
       <obj_property name="ObjectShortName">sys_clk_s</obj_property>
@@ -124,28 +112,26 @@
       <obj_property name="ElementShortName">cmp_conv_amp_s[32:0]</obj_property>
       <obj_property name="ObjectShortName">cmp_conv_amp_s[32:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_range_detector/dut/cmp_conv_img_s" type="array">
       <obj_property name="ElementShortName">cmp_conv_img_s[32:0]</obj_property>
       <obj_property name="ObjectShortName">cmp_conv_img_s[32:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_amp_long_s" type="array">
-      <obj_property name="ElementShortName">fir_amp_long_s[32:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_amp_long_s[32:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_pha_long_s" type="array">
-      <obj_property name="ElementShortName">fir_pha_long_s[32:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_pha_long_s[32:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_range_detector/dut/fir_II_vld_s" type="logic">
       <obj_property name="ElementShortName">fir_II_vld_s</obj_property>
       <obj_property name="ObjectShortName">fir_II_vld_s</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_II_s" type="array">
-      <obj_property name="ElementShortName">fir_II_s[31:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_II_s[31:0]</obj_property>
+   <wvobject fp_name="/tb_range_detector/dut/fir_ampl_s" type="array">
+      <obj_property name="ElementShortName">fir_ampl_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fir_ampl_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/fir_phas_s" type="array">
+      <obj_property name="ElementShortName">fir_phas_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fir_phas_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
 </wave_config>
