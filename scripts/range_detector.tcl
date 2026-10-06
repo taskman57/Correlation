@@ -34,7 +34,7 @@ foreach ip_file $target_ip_files {
         generate_target all [get_files $ip_file]
         puts "    Added IP: $ip_file"
     } else {
-        puts "    [WARNING] IP file not found: $ip_file"
+        puts "    \[WARNING\] IP file not found: $ip_file"
     }
 }
 
@@ -43,6 +43,7 @@ set target_rtl_files [list \
     "$module_dir/rtl_src/radar_pkg.vhd" \
     "$module_dir/rtl_src/DSP_wrapper.vhd" \
     "$module_dir/rtl_src/fir_impl.vhd" \
+    "$module_dir/rtl_src/complex_convolution.vhd" \
     "$module_dir/rtl_src/range_detector.vhd" \
 ]
 
@@ -52,7 +53,7 @@ foreach rtl_file $target_rtl_files {
         add_files -fileset sources_1 $rtl_file
         puts "    Added RTL: $rtl_file"
     } else {
-        puts "    [WARNING] RTL file not found: $rtl_file"
+        puts "    \[WARNING\] RTL file not found: $rtl_file"
     }
 }
 
@@ -69,7 +70,7 @@ foreach sim_file $target_sim_files {
         add_files -fileset sim_1 $sim_file
         puts "    Added Sim Asset: $sim_file"
     } else {
-        puts "    [WARNING] File not found: $sim_file"
+        puts "    \[WARNING\] File not found: $sim_file"
     }
 }
 

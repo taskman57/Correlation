@@ -34,6 +34,7 @@ Correlation/
 │   ├── tb_range_detector.vhd     # Top-level range detector testbench
 │   └── test_fix_round.vhd        # Fixed-point rounding testbench
 ├── rtl_src/                      # Synthesizable RTL source files
+│   ├── complex_convolution.vhd   # Top-level complex convolution integrating I/Q FIRs and rounding
 │   ├── conv_rounding.vhd         # Convergent rounding (round-to-even) logic
 │   ├── DSP_wrapper.vhd           # Parametric DSP48E1 macro wrapper
 │   ├── fir_impl.vhd              # 50-tap symmetric folded FIR filter engine
@@ -57,7 +58,8 @@ The `m_files/` directory contains system-level scripts used to design, quantize,
 1. **System Correlation Model (`Correlation.m`):** Top-level simulation modeling signal pulse compression, matched filtering, and theoretical correlation limits.
 2. **Convolution & Fixed-Point DSP (`myconv.m`):** Custom convolution routine modeling fixed-point arithmetic before RTL migration.
 3. **Bit-True Rounding Models (`myround.m` & `my_comp_round.m`):** Implements convergent rounding (round-to-even) and complex rounding models to eliminate DC bias during bit-width reduction.
-4. **Golden Vector Dataset (`golden_ref_vector.dat`):** Exported test vector dataset used to populate `rtl_sim/rtl_golden_ref_vector.vhd` for self-checking VHDL simulation.
+4. **Hardware Streaming Alignment:** To perfectly emulate the continuous pipelined nature of the hardware, the software flattens the multi-pulse noisy RX matrix into a serialized 1D array. It injects a 50-sample blanking window (zeros) at the start of each Pulse Repetition Interval (PRI) to emulate the physical radar receiver muting during the transmit window, successfully flushing the filter tails. 
+5. **Golden Vector Dataset (`golden_ref_vector.dat`):** Exported test vector dataset used to populate `rtl_sim/rtl_golden_ref_vector.vhd` for self-checking VHDL simulation.
 
 ### Simulation & Golden Vector Workflow
 The correlation simulation is controlled via `Correlation(act_prnt, new_test_vector)` in Octave/MATLAB:
@@ -88,7 +90,12 @@ The following snapshots demonstrate the Octave simulation results, establishing 
 * **Resource Optimization:** Consumes only 10 DSP48E1 slices (~4.5% of Zynq-7000 DSP resources) for complete complex I/Q filtering while achieving zero timing violations.
 * **Clock Domain Crossing (CDC):** Dual ADC channels cross safely into the 250 MHz DSP clock domain via an asynchronous FIFO (`adc_fifo`).
 
-### 2. Waveform Verification
+### 2. Complex Convolution & Bit-True Streaming Verification
+The `complex_convolution.vhd` module encapsulates the dual folded FIRs along with custom convergent rounding logic. The RTL has been rigorously validated against the Octave models:
+* **RX Blanking Synchronization:** The RTL automatically enforces a 50-cycle input suppression (zeros) at the start of each PRI to emulate TX-to-RX isolation, identically matching the 1D serialized algorithm in Octave.
+* **Full-Resolution vs. Rounded Output:** The system preserves full 32-bit internal precision during integration before seamlessly slicing down to a 16-bit output. Both the raw 32-bit streaming output and the convergent rounded 16-bit payload are validated cycle-by-cycle against the Octave references, verifying that zero DC-bias is introduced.
+
+### 3. Waveform Verification
 
 #### Single-Channel Baseline Verification
 Functional baseline validation for the single-channel folded FIR engine:
