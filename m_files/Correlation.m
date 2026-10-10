@@ -260,10 +260,11 @@ function Correlation(act_prnt, new_test_vector)
     % Single continuous streaming convolution across all pulses
     conv = myconv(norm_noisy_rx_int, h_int, act_prnt);
 
-    fid = fopen('conv_dump.dat', 'w');
-    dump_data = [real(conv(:))'; imag(conv(:))'];
-    fprintf(fid, '%d %d\n', dump_data);
-    fclose(fid);
+    % full width convolution dump to compare with RTL
+##    fid = fopen('conv_dump.dat', 'w');
+##    dump_data = [real(conv(:))'; imag(conv(:))'];
+##    fprintf(fid, '%d %d\n', dump_data);
+##    fclose(fid);
 
     total_clips = 0;
     quant_conv = zeros(size(conv));
@@ -279,10 +280,11 @@ function Correlation(act_prnt, new_test_vector)
       endif
     endfor
 
-    fid = fopen('quant_conv_dump.dat', 'w');
-    dump_data = [real(quant_conv(:))'; imag(quant_conv(:))'];
-    fprintf(fid, '%d %d\n', dump_data);
-    fclose(fid);
+    % round to nearest convolution dump to compare with RTL
+##    fid = fopen('quant_conv_dump.dat', 'w');
+##    dump_data = [real(quant_conv(:))'; imag(quant_conv(:))'];
+##    fprintf(fid, '%d %d\n', dump_data);
+##    fclose(fid);
 
     if act_prnt == 1
       fprintf('Total Number of Clips at /2^16: %d\n', total_clips);
@@ -304,10 +306,12 @@ function Correlation(act_prnt, new_test_vector)
     coherent_sum = sum(MF(win_idx, :), 2);
 
     full_coh_sum = sum(MF, 2);
-    fid = fopen('coherent_sum_quant_conv_dump.dat', 'w');
-    dump_data = [real(full_coh_sum(:))'; imag(full_coh_sum(:))'];
-    fprintf(fid, '%d %d\n', dump_data);
-    fclose(fid);
+
+    % coherent sum dump to compare with RTL
+##    fid = fopen('coherent_sum_quant_conv_dump.dat', 'w');
+##    dump_data = [real(full_coh_sum(:))'; imag(full_coh_sum(:))'];
+##    fprintf(fid, '%d %d\n', dump_data);
+##    fclose(fid);
 
     % ==============  Provide test vectors for CORDIC =================
     if act_prnt == 1
@@ -410,5 +414,14 @@ function Correlation(act_prnt, new_test_vector)
     peak_conv_idx = win_idx(1) + peak_idx - 1;
     lag_samples_est = peak_conv_idx - N;
     R_est = (lag_samples_est / fs) * c / 2;
+
+    % coherent size abs dump to compare with RTL
+    fid = fopen('peak_region_abs.dat', 'w');
+    peak_range = 1.64676*abs(full_coh_sum(lag_samples_est-N : lag_samples_est+3*N));
+    figure;
+    plot(peak_range);
+    fprintf(fid, '%d\n', peak_range);
+    fclose(fid);
+
     fprintf('Estimated range: %.2f m (Target: %.0f m)\n', R_est, target_dist);
 endfunction

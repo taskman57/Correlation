@@ -25,6 +25,7 @@ set_property simulator_language VHDL [current_project]
 set target_ip_files [list \
     "$module_dir/ipcores/adc_fifo/adc_fifo.xci" \
     "$module_dir/ipcores/clk_dsp/clk_dsp.xci" \
+    "$module_dir/ipcores/IQ2vector/IQ2vector.xci" \
 ]
 
 puts "--> Adding targeted IP cores..."
@@ -45,6 +46,7 @@ set target_rtl_files [list \
     "$module_dir/rtl_src/fir_impl.vhd" \
     "$module_dir/rtl_src/complex_convolution.vhd" \
     "$module_dir/rtl_src/coherent_sum.vhd" \
+    "$module_dir/rtl_src/vectoring.vhd" \
     "$module_dir/rtl_src/range_detector.vhd" \
 ]
 

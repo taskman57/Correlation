@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="353,351.917 ns"></ZoomStartTime>
-      <ZoomEndTime time="353,532.253 ns"></ZoomEndTime>
-      <Cursor1Time time="3,350.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="420.000001 us"></ZoomEndTime>
+      <Cursor1Time time="400.510000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="181"></NameColumnWidth>
+      <NameColumnWidth column_width="169"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="30" />
+   <WVObjectSize size="35" />
    <wvobject fp_name="/tb_range_detector/clk_p" type="logic">
       <obj_property name="ElementShortName">clk_p</obj_property>
       <obj_property name="ObjectShortName">clk_p</obj_property>
@@ -169,10 +169,45 @@
       <obj_property name="ElementShortName">conv_real_s[15:0]</obj_property>
       <obj_property name="ObjectShortName">conv_real_s[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_range_detector/dut/conv_imag_s" type="array">
       <obj_property name="ElementShortName">conv_imag_s[15:0]</obj_property>
       <obj_property name="ObjectShortName">conv_imag_s[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider32">
+      <obj_property name="label">Vector</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/vect_val_s" type="logic">
+      <obj_property name="ElementShortName">vect_val_s</obj_property>
+      <obj_property name="ObjectShortName">vect_val_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/vect_ampl_s" type="array">
+      <obj_property name="ElementShortName">vect_ampl_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">vect_ampl_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/peak_idx_o" type="array">
+      <obj_property name="ElementShortName">peak_idx_o[11:0]</obj_property>
+      <obj_property name="ObjectShortName">peak_idx_o[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/peak_val_o" type="logic">
+      <obj_property name="ElementShortName">peak_val_o</obj_property>
+      <obj_property name="ObjectShortName">peak_val_o</obj_property>
    </wvobject>
 </wave_config>
