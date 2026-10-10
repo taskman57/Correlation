@@ -23,10 +23,8 @@ architecture sim of tb_range_detector is
     signal pulse_i          : std_logic:='0';
 
     --  outputs
-    signal low_lev_o        : std_logic;
-    signal mid_lev_o        : std_logic;
-    signal hig_lev_o        : std_logic;
-    signal obj_det_o        : std_logic;
+    signal peak_idx_o       : std_logic_vector(11 downto 0);
+    signal peak_val_o       : std_logic;
 
     -- constants
     constant clk_per_c      : time := 20 ns;    -- 50MHz system oscilator clock frequency
@@ -43,10 +41,8 @@ begin
         adc_amp_i   => adc_amp_i,
         adc_pha_i   => adc_pha_i,
         pulse_i     => pulse_i,
-        low_lev_o   => low_lev_o,
-        mid_lev_o   => mid_lev_o,
-        hig_lev_o   => hig_lev_o,
-        obj_det_o   => obj_det_o
+        peak_idx_o  => peak_idx_o,
+        peak_val_o  => peak_val_o
     );
 
     clk_stim: process

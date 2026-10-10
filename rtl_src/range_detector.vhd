@@ -22,10 +22,8 @@ entity range_detector is
         pulse_i         : in std_logic;
 
         --  processing results
-        low_lev_o       : out std_logic;
-        mid_lev_o       : out std_logic;
-        hig_lev_o       : out std_logic;
-        obj_det_o       : out std_logic
+        peak_idx_o      : out std_logic_vector(11 downto 0);    -- PULSE_RXSAMPLES_C(2450) sample(bin) per pulse
+        peak_val_o      : out std_logic
     );
 end range_detector;
 
@@ -55,6 +53,13 @@ architecture Behavioral of range_detector is
     signal acc_conv_real_s  : std_logic_vector(ADC_BIT_RES_C+ACCUM_BIT_GROWTH_C-1 downto 0);
     signal acc_conv_imag_s  : std_logic_vector(ADC_BIT_RES_C+ACCUM_BIT_GROWTH_C-1 downto 0);
 
+    signal vect_ampl_s      : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal vect_phase_s     : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+
+    signal max_peak_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal peak_idx_s       : integer range 0 to PULSE_RXSAMPLES_C-1 := 0;
+
+    signal vect_val_s       : std_logic;
     signal conv_vld_s       : std_logic;
     signal acc_conv_vld_s   : std_logic;
     signal low_lev_s        : std_logic;
@@ -62,9 +67,11 @@ architecture Behavioral of range_detector is
     signal hig_lev_s        : std_logic;
 
     signal cyc_ctr_s        : integer range 0 to DSP_FOLD_STAGES_C - 1:=4;
+    attribute MAX_FANOUT    : string;
+    attribute MAX_FANOUT of cyc_ctr_s : signal is "8";
 
     -- synthesis translate_off
-    file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/coherent_summation.dat";
+    file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/vector_summation.dat";
     -- synthesis translate_on
 
 begin
@@ -230,53 +237,64 @@ begin
         sum_o   => acc_conv_imag_s,
         vld_o   => open
     );
-    obj_det_o   <= acc_conv_vld_s;
+
+    IQ_Vector_inst: entity work.vectoring
+    Port map(
+        sys_clk_i   => sys_clk_s,
+        sys_rst_i   => sys_rst_s,
+        inp_val_i   => acc_conv_vld_s,
+        adcI_i      => acc_conv_real_s,     -- cartesian X
+        adcq_i      => acc_conv_imag_s,     -- cartesian Y
+        dout_val_o  => vect_val_s,
+        ampl_o      => vect_ampl_s,
+        phase_o     => vect_phase_s
+    );
+    peak_search_proc: process(sys_clk_s)
+        variable vect_val_v : std_logic := '0';
+        variable ampl_ctr_v : integer range 0 to PULSE_RXSAMPLES_C -1 := 0;
+    begin
+        if rising_edge(sys_clk_s) then
+            if sys_rst_s = '1' then
+                peak_idx_o  <= (others => '0');
+                peak_val_o  <= '0';
+                ampl_ctr_v  := 0;
+            else
+                peak_val_o  <= '0';
+                peak_idx_o  <= (others => '0');
+                if vect_val_s = '1' then
+                    ampl_ctr_v  := ampl_ctr_v + 1;
+                else
+                    ampl_ctr_v  := 0;
+                end if;
+                if vect_val_s = '1' and vect_val_v = '0' then   -- vectors are sent out
+                    peak_idx_s  <= 1;
+                    max_peak_s  <= vect_ampl_s;
+                elsif vect_val_s = '1' and vect_val_v = '1' then    -- look for the maximum
+                    if unsigned(vect_ampl_s) > unsigned(max_peak_s) then    -- We assume one target
+                        max_peak_s  <= vect_ampl_s;
+                        peak_idx_s  <= ampl_ctr_v;
+                    end if;
+                elsif vect_val_s = '0' and vect_val_v = '1' then    -- load max peack index to the output
+                    peak_val_o  <= '1';
+                    peak_idx_o  <= std_logic_vector(to_unsigned(peak_idx_s,12));
+                end if;
+                vect_val_v  := vect_val_s;
+            end if;
+        end if;
+    end process;
+
 -- synthesis translate_off
     simulation: process(sys_clk_s)
         variable lin_compx_v  : line;
     begin
         if rising_edge(sys_clk_s) then
-            if acc_conv_vld_s = '1' then
-                report "Writing coherent summation result";
-                write(lin_compx_v, to_integer(signed(acc_conv_real_s)));
-
-                write(lin_compx_v, string'(" "));
-
-                write(lin_compx_v, to_integer(signed(acc_conv_imag_s)));
-
+            if vect_val_s = '1' then
+                report "Writing abs result";
+                write(lin_compx_v, to_integer(signed(vect_ampl_s)));
                 writeline(cmpx_conv_file, lin_compx_v);
             end if;
         end if;
     end process;
 -- synthesis translate_on
-
-    just_4_test:
-    process(sys_clk_s)
-    begin
-        if rising_edge(sys_clk_s) then
-            if sys_rst_s = '1' then
-                low_lev_s   <= '0';
-                mid_lev_s   <= '0';
-                hig_lev_s   <= '0';
-            else
-                if unsigned(acc_conv_real_s) < 2**13-1 then
-                    low_lev_s   <= '1';
-                    mid_lev_s   <= '0';
-                    hig_lev_s   <= '0';
-                elsif unsigned(acc_conv_real_s) > 2**13-1 and unsigned(acc_conv_imag_s) < 2**14-1 then
-                    low_lev_s   <= '0';
-                    mid_lev_s   <= '1';
-                    hig_lev_s   <= '0';
-                elsif unsigned(acc_conv_imag_s) > 2**14-1 then
-                    low_lev_s   <= '0';
-                    mid_lev_s   <= '0';
-                    hig_lev_s   <= '1';
-                end if;
-                low_lev_o       <= low_lev_s;
-                mid_lev_o       <= mid_lev_s;
-                hig_lev_o       <= hig_lev_s;
-            end if;
-        end if;
-    end process;
 
 end Behavioral;
