@@ -10,11 +10,11 @@ entity fir_impl is
     Port ( 
         clk_i           : in std_logic;
         rst_i           : in std_logic;
+        rd_clk_i        : in std_logic;
         clk_ena_i       : in std_logic;
         cyc_ctr_i       : in integer range 0 to DSP_FOLD_STAGES_C-1;
         data_i          : in std_logic_vector(ADC_BIT_RES_C-1 downto 0);
         coef_i          : in chrp_rom_t;
-        rdclk_i         : in std_logic;
         fir_res_o       : out std_logic_vector(31 downto 0);
         fir_vld_o       : out std_logic
     );
@@ -146,9 +146,9 @@ begin
         end if;
     end process reg_fir_proc;
 
-    simple_cdc_proc: process(rdclk_i)
+    simple_cdc_proc: process(rd_clk_i)
     begin
-        if rising_edge(rdclk_i) then
+        if rising_edge(rd_clk_i) then
             fir_res_o       <= reg_out_s;
             fir_vld_o       <= fir_vld_s;
         end if;

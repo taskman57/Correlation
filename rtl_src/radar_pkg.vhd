@@ -1,15 +1,19 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use IEEE.math_real.all;
 
 package radar_pkg is
 
-    constant ADC_BIT_RES_C      : integer   := 16;
-    constant FIR_LEN_C          : integer   := 50;
-    constant DSP_LATANCY_C      : integer   := 4;   -- 2 FFs before multiplier + 1 (after multiplier) + 1 (after ALU)
-    constant TIMING_COMP_C      : integer   := 1;   -- Compensate for 1-cycle pipeline delay added to break the cyc_ctr_s to OPMODE critical path
-    constant DSP_FOLD_STAGES_C  : integer   := 5;
-    constant PULSE_SAMPLES_C    : integer   := 2500;
+    constant ADC_BIT_RES_C          : integer   := 16;
+    constant FIR_LEN_C              : integer   := 50;
+    constant DSP_LATANCY_C          : integer   := 4;   -- 2 FFs before multiplier + 1 (after multiplier) + 1 (after ALU)
+    constant TIMING_COMP_C          : integer   := 1;   -- Compensate for 1-cycle pipeline delay added to break the cyc_ctr_s to OPMODE critical path
+    constant DSP_FOLD_STAGES_C      : integer   := 5;
+    constant PULSE_SAMPLES_C        : integer   := 2500;
+    constant PULSE_RXSAMPLES_C      : integer   := 2450;
+    constant COHERENT_NP_C          : real      := 8.0; -- System design was based on 
+    constant ACCUM_BIT_GROWTH_C     : integer   := integer(ceil(log2(COHERENT_NP_C)));
 
     type sfr_fir_t is array(FIR_LEN_C-2 downto 0) of signed(ADC_BIT_RES_C-1 downto 0);
     type chrp_rom_t     is array(natural range <>) of signed(ADC_BIT_RES_C-1 downto 0);

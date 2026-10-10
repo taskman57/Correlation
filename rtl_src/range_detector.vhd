@@ -49,14 +49,23 @@ architecture Behavioral of range_detector is
     signal adc_pha_s        : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal amp_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal pha_fifo_dat_s   : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-    signal fir_ampl_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
-    signal fir_phas_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal conv_real_s      : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
+    signal conv_imag_s      : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
 
+    signal acc_conv_real_s  : std_logic_vector(ADC_BIT_RES_C+ACCUM_BIT_GROWTH_C-1 downto 0);
+    signal acc_conv_imag_s  : std_logic_vector(ADC_BIT_RES_C+ACCUM_BIT_GROWTH_C-1 downto 0);
+
+    signal conv_vld_s       : std_logic;
+    signal acc_conv_vld_s   : std_logic;
     signal low_lev_s        : std_logic;
     signal mid_lev_s        : std_logic;
     signal hig_lev_s        : std_logic;
 
     signal cyc_ctr_s        : integer range 0 to DSP_FOLD_STAGES_C - 1:=4;
+
+    -- synthesis translate_off
+    file cmpx_conv_file     : text open write_mode is "../../../../../rtl_sim/coherent_summation.dat";
+    -- synthesis translate_on
 
 begin
 
@@ -189,17 +198,57 @@ begin
     complex_conv_inst: entity work.complex_convolution
     Port map(
         clk_i           => dsp_clk_s,
-        rd_clk_i        => sys_clk_s,
         rst_i           => dsp_rst_s,
+        rd_clk_i        => sys_clk_s,
+        rd_rst_i        => sys_rst_s,
         clk_ena_i       => amp_fifo_en_s, 
         cyc_ctr_i       => cyc_ctr_s, 
         adc_real_i      => amp_fifo_dat_s,
         adc_imag_i      => pha_fifo_dat_s,
 
-        conv_real_o     => fir_ampl_s,
-        conv_imag_o     => fir_phas_s,
-        conv_vld_o      => obj_det_o
+        conv_real_o     => conv_real_s,
+        conv_imag_o     => conv_imag_s,
+        conv_vld_o      => conv_vld_s
     );
+
+    real_coherent_sum_inst: entity work.coherent_sum
+    Port map(
+        clk_i   => sys_clk_s,
+        rst_i   => sys_rst_s,
+        data_i  => conv_real_s,
+        ena_i   => conv_vld_s,
+        sum_o   => acc_conv_real_s,
+        vld_o   => acc_conv_vld_s
+    );
+
+    imag_coherent_sum_inst: entity work.coherent_sum
+    Port map(
+        clk_i   => sys_clk_s,
+        rst_i   => sys_rst_s,
+        data_i  => conv_imag_s,
+        ena_i   => conv_vld_s,
+        sum_o   => acc_conv_imag_s,
+        vld_o   => open
+    );
+    obj_det_o   <= acc_conv_vld_s;
+-- synthesis translate_off
+    simulation: process(sys_clk_s)
+        variable lin_compx_v  : line;
+    begin
+        if rising_edge(sys_clk_s) then
+            if acc_conv_vld_s = '1' then
+                report "Writing coherent summation result";
+                write(lin_compx_v, to_integer(signed(acc_conv_real_s)));
+
+                write(lin_compx_v, string'(" "));
+
+                write(lin_compx_v, to_integer(signed(acc_conv_imag_s)));
+
+                writeline(cmpx_conv_file, lin_compx_v);
+            end if;
+        end if;
+    end process;
+-- synthesis translate_on
 
     just_4_test:
     process(sys_clk_s)
@@ -210,15 +259,15 @@ begin
                 mid_lev_s   <= '0';
                 hig_lev_s   <= '0';
             else
-                if unsigned(fir_ampl_s) < 2**13-1 then
+                if unsigned(acc_conv_real_s) < 2**13-1 then
                     low_lev_s   <= '1';
                     mid_lev_s   <= '0';
                     hig_lev_s   <= '0';
-                elsif unsigned(fir_ampl_s) > 2**13-1 and unsigned(fir_phas_s) < 2**14-1 then
+                elsif unsigned(acc_conv_real_s) > 2**13-1 and unsigned(acc_conv_imag_s) < 2**14-1 then
                     low_lev_s   <= '0';
                     mid_lev_s   <= '1';
                     hig_lev_s   <= '0';
-                elsif unsigned(fir_phas_s) > 2**14-1 then
+                elsif unsigned(acc_conv_imag_s) > 2**14-1 then
                     low_lev_s   <= '0';
                     mid_lev_s   <= '0';
                     hig_lev_s   <= '1';

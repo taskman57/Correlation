@@ -303,6 +303,12 @@ function Correlation(act_prnt, new_test_vector)
     win_idx = max(1, expected_conv_idx - half_win) : min(size(MF,1), expected_conv_idx + half_win);
     coherent_sum = sum(MF(win_idx, :), 2);
 
+    full_coh_sum = sum(MF, 2);
+    fid = fopen('coherent_sum_quant_conv_dump.dat', 'w');
+    dump_data = [real(full_coh_sum(:))'; imag(full_coh_sum(:))'];
+    fprintf(fid, '%d %d\n', dump_data);
+    fclose(fid);
+
     % ==============  Provide test vectors for CORDIC =================
     if act_prnt == 1
       % 1. Find the peak in the COHERENT SUM (the strong signal)

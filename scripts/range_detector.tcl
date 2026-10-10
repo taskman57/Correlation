@@ -44,6 +44,7 @@ set target_rtl_files [list \
     "$module_dir/rtl_src/DSP_wrapper.vhd" \
     "$module_dir/rtl_src/fir_impl.vhd" \
     "$module_dir/rtl_src/complex_convolution.vhd" \
+    "$module_dir/rtl_src/coherent_sum.vhd" \
     "$module_dir/rtl_src/range_detector.vhd" \
 ]
 

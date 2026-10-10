@@ -2,7 +2,7 @@
 
 This repository implements a high-precision, hardware-efficient Radar processing chain in standard VHDL. It features a bit-true workflow validating DSP48E1 hardware implementations against Octave/MATLAB golden reference models.
 
-The primary engine is a **Dual-Channel Quadrature (I/Q) Range Detector / Matched Filter** utilizing two parallel 5x time-division folded 50-tap symmetric FIR architectures. Running at 250 MHz on budget Zynq-7000 silicon, the complete dual-channel processing chain requires only **10 DSP48E1 slices** while maintaining full timing closure.
+The primary engine is a **Quad-Channel Complex Matched Filter & Coherent Integrator** utilizing four parallel 5x time-division folded 50-tap symmetric FIR architectures followed by a dual Block RAM range-bin coherent accumulator. Running at 250 MHz on budget Zynq-7000 silicon, the complete quad-channel filtering stage requires **20 DSP48E1 slices** while maintaining full timing closure.
 
 ---
 
@@ -22,7 +22,7 @@ Correlation/
 │   ├── clk_dsp/                  # Clocking Wizard generating 250 MHz DSP clock
 │   └── IQ2vector/                # CORDIC phase extraction IP core
 ├── m_files/                      # Octave/MATLAB scripts for bit-true golden models
-│   ├── Correlation.m             # System-level correlation & matched filter simulation model
+│   ├── Correlation_3.m           # System-level correlation, matched filter & coherent sum model
 │   ├── golden_ref_vector.dat     # Exported golden reference test data
 │   ├── my_comp_round.m           # Complex rounding helper model
 │   ├── myconv.m                  # Bit-true fixed-point convolution algorithm
@@ -34,7 +34,8 @@ Correlation/
 │   ├── tb_range_detector.vhd     # Top-level range detector testbench
 │   └── test_fix_round.vhd        # Fixed-point rounding testbench
 ├── rtl_src/                      # Synthesizable RTL source files
-│   ├── complex_convolution.vhd   # Top-level complex convolution integrating I/Q FIRs and rounding
+│   ├── coherent_sum.vhd          # Dual BRAM coherent range-bin pulse accumulator
+│   ├── complex_convolution.vhd   # Top-level complex convolution integrating 4 I/Q FIRs and rounding
 │   ├── conv_rounding.vhd         # Convergent rounding (round-to-even) logic
 │   ├── DSP_wrapper.vhd           # Parametric DSP48E1 macro wrapper
 │   ├── fir_impl.vhd              # 50-tap symmetric folded FIR filter engine
@@ -55,57 +56,34 @@ Correlation/
 
 The `m_files/` directory contains system-level scripts used to design, quantize, and verify the VHDL RTL implementation:
 
-1. **System Correlation Model (`Correlation.m`):** Top-level simulation modeling signal pulse compression, matched filtering, and theoretical correlation limits.
+1. **System Correlation & Coherent Accumulation Model (`Correlation_3.m`):** Top-level simulation modeling pulse compression, complex matrix matched filtering, and inter-pulse coherent integration.
 2. **Convolution & Fixed-Point DSP (`myconv.m`):** Custom convolution routine modeling fixed-point arithmetic before RTL migration.
 3. **Bit-True Rounding Models (`myround.m` & `my_comp_round.m`):** Implements convergent rounding (round-to-even) and complex rounding models to eliminate DC bias during bit-width reduction.
-4. **Hardware Streaming Alignment:** To perfectly emulate the continuous pipelined nature of the hardware, the software flattens the multi-pulse noisy RX matrix into a serialized 1D array. It injects a 50-sample blanking window (zeros) at the start of each Pulse Repetition Interval (PRI) to emulate the physical radar receiver muting during the transmit window, successfully flushing the filter tails. 
+4. **Hardware Streaming Alignment:** To perfectly emulate the continuous pipelined nature of the hardware, the software flattens the multi-pulse noisy RX matrix into a serialized 1D array. It injects a 50-sample blanking window (zeros) at the start of each Pulse Repetition Interval (PRI) to emulate physical radar receiver muting during the transmit window, successfully flushing the filter tails. 
 5. **Golden Vector Dataset (`golden_ref_vector.dat`):** Exported test vector dataset used to populate `rtl_sim/rtl_golden_ref_vector.vhd` for self-checking VHDL simulation.
-
-### Simulation & Golden Vector Workflow
-The correlation simulation is controlled via `Correlation(act_prnt, new_test_vector)` in Octave/MATLAB:
-
-* **Debugging & Printing (`act_prnt`):** Set to `1` to enable verbose console debugging and dump VHDL-ready ROM arrays (`chrp_ampl_c`, `chrp_phs_c`, `inph_c`, `quadr_c`).
-* **Vector Generation (`new_test_vector`):**
-  * `Correlation(0, 1)`: Generates a new stochastic noisy RX signal package and writes updated reference files (`golden_ref_vector.m` for Octave and `rtl_golden_ref_vector.vhd` for the Vivado RTL testbench).
-  * `Correlation(0, 0)`: Loads the static baseline vector set. Running this mode guarantees that Octave and RTL simulations operate on an identical, unified test dataset for strict bit-true correlation verification.
-
-> **Note:** A pre-generated golden vector file (`rtl_sim/rtl_golden_ref_vector.vhd`) is provided in the repository as the default baseline reference.
-
-### Simulation & Theoretical Limits
-The following snapshots demonstrate the Octave simulation results, establishing the theoretical baseline for the RTL implementation:
-
-![Transmitted and Noisy RX Pulses](docs/tx_noisy_rx_pulses.png)
-*Transmitted chirp and deeply embedded noisy RX signal (SNR = -30.25dB).*
-
-![Coherent Integration and Range Detection](docs/detected_range.png)
-*Matched filter output showcasing successful pulse compression and coherent integration gain.*
 
 ---
 
 ## Hardware Architecture & Verification
 
-### 1. Dual-Channel Quadrature (I/Q) Matched Filter
-* **Parallel Processing Engines:** Dual 50-tap symmetric FIR filters process In-Phase (I) and Quadrature (Q) ADC channels in parallel.
-* **5x Time-Division Folding:** Each channel folds 50 taps down to 5 cascaded DSP48E1 slices operating at 250 MHz (5 clock cycles per input sample).
-* **Resource Optimization:** Consumes only 10 DSP48E1 slices (~4.5% of Zynq-7000 DSP resources) for complete complex I/Q filtering while achieving zero timing violations.
+### 1. Quad-Channel Complex Matched Filter
+To achieve true complex cross-convolution $(I_{rx} + jQ_{rx}) * (I_{tx} - jQ_{tx}) = (I_{rx}I_{tx} + Q_{rx}Q_{tx}) + j(Q_{rx}I_{tx} - I_{rx}Q_{tx})$, four distinct FIR instances are utilized:
+* **4 Parallel Processing Engines:** Four 50-tap symmetric FIR filter instances process $I_{rx} \cdot I_{tx}$, $Q_{rx} \cdot Q_{tx}$, $Q_{rx} \cdot I_{tx}$, and $I_{rx} \cdot Q_{tx}$ in parallel.
+* **5x Time-Division Folding:** Each FIR engine folds 50 taps down to 5 cascaded DSP48E1 slices operating at 250 MHz (5 clock cycles per input sample).
+* **Resource Consumption:** Consumes 20 DSP48E1 slices (~9% of Zynq-7000 DSP resources) for complete complex I/Q filtering while achieving zero timing violations.
 * **Clock Domain Crossing (CDC):** Dual ADC channels cross safely into the 250 MHz DSP clock domain via an asynchronous FIFO (`adc_fifo`).
 
 ### 2. Complex Convolution & Bit-True Streaming Verification
-The `complex_convolution.vhd` module encapsulates the dual folded FIRs along with custom convergent rounding logic. The RTL has been rigorously validated against the Octave models:
-* **RX Blanking Synchronization:** The RTL automatically enforces a 50-cycle input suppression (zeros) at the start of each PRI to emulate TX-to-RX isolation, identically matching the 1D serialized algorithm in Octave.
-* **Full-Resolution vs. Rounded Output:** The system preserves full 32-bit internal precision during integration before seamlessly slicing down to a 16-bit output. Both the raw 32-bit streaming output and the convergent rounded 16-bit payload are validated cycle-by-cycle against the Octave references, verifying that zero DC-bias is introduced.
+The `complex_convolution.vhd` module encapsulates the four folded FIRs along with custom convergent rounding logic. The RTL has been rigorously validated against the Octave models:
+* **RX Blanking Synchronization:** The RTL automatically enforces a 50-cycle input suppression (zeros) at the start of each PRI to emulate TX-to-RX isolation, identically matching the serialized algorithm in Octave.
+* **Full-Resolution vs. Rounded Output:** The system preserves full 32-bit internal precision during integration before seamlessly slicing down to a 16-bit output. Both the raw 32-bit streaming output and the convergent rounded 16-bit payload are validated cycle-by-cycle against Octave references, verifying that zero DC-bias is introduced.
 
-### 3. Waveform Verification
-
-#### Single-Channel Baseline Verification
-Functional baseline validation for the single-channel folded FIR engine:
-
-![Single-Channel Matched Filter Waveform Output](docs/Firt_matched_filter.png)
-
-#### Dual-Channel Quadrature (I/Q) Verification
-Parallel channel output validation for In-Phase and Quadrature paths (`fir_amp_s` and `fir_pha_s`) against the Octave golden reference vector package (`rtl_golden_ref_vector.vhd`):
-
-![Quadrature Matched Filter Waveform Output](docs/IQ_match_filter.png)
+### 3. Coherent Inter-Pulse Summation (`coherent_sum.vhd`)
+Following complex convolution, pulse-to-pulse coherent integration is performed across multiple PRIs to maximize SNR gain:
+* **Dual Block RAM Architecture:** Implements a dual-port RAM pipeline (`acc_ram_s`) storing range-bin I and Q accumulation values across consecutive PRIs.
+* **Pulse Repetition Interval (PRI) Boundary Tracking:** Uses the falling edge of the input valid window to reset range-bin pointers and increment pulse counters up to the target pulse count ($N_{pulses} = 8$).
+* **Precision Expansion:** Integrates 16-bit rounded complex samples into 19-bit accumulator bins to prevent overflow during multi-pulse summation.
+* **Bit-True Verification:** Output validated cycle-by-cycle against the Octave matrix integration reference (`coherent_sum_quant_conv_dump.dat`).
 
 ---
 
@@ -123,6 +101,6 @@ runme.bat
 The script automatically:
 * Sources the Xilinx Vivado environment via `settings64.bat`.
 * Imports IP cores (`adc_fifo.xci`, `clk_dsp.xci`).
-* Adds targeted RTL sources from `rtl_src/` and simulation assets from `rtl_sim/`.
+* Adds targeted RTL sources (including `coherent_sum.vhd`) from `rtl_src/` and simulation assets from `rtl_sim/`.
 * Sets `range_detector` as the top-level entity and `tb_range_detector` as the simulation top.
 * Applies constraints from `constraints/range_detector.xdc`.

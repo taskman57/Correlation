@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="520.283334 us"></ZoomEndTime>
-      <Cursor1Time time="403.000000 us"></Cursor1Time>
+      <ZoomStartTime time="353,351.917 ns"></ZoomStartTime>
+      <ZoomEndTime time="353,532.253 ns"></ZoomEndTime>
+      <Cursor1Time time="3,350.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="193"></NameColumnWidth>
+      <NameColumnWidth column_width="181"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
+   <WVObjectSize size="30" />
    <wvobject fp_name="/tb_range_detector/clk_p" type="logic">
       <obj_property name="ElementShortName">clk_p</obj_property>
       <obj_property name="ObjectShortName">clk_p</obj_property>
@@ -107,40 +107,72 @@
       <obj_property name="label">32-Bit Filter output</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/cmp_conv_amp_s" type="array">
-      <obj_property name="ElementShortName">cmp_conv_amp_s[32:0]</obj_property>
-      <obj_property name="ObjectShortName">cmp_conv_amp_s[32:0]</obj_property>
+   <wvobject fp_name="/tb_range_detector/dut/complex_conv_inst/conv_ctr_s[2]" type="logic">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">[2]</obj_property>
+      <obj_property name="ObjectShortName">[2]</obj_property>
+      <obj_property name="label">conv_ctr_s_bit[2]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/complex_conv_inst/conv_vld_o" type="logic">
+      <obj_property name="ElementShortName">conv_vld_o</obj_property>
+      <obj_property name="ObjectShortName">conv_vld_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/complex_conv_inst/ctr_s" type="other">
+      <obj_property name="ElementShortName">ctr_s</obj_property>
+      <obj_property name="ObjectShortName">ctr_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/complex_conv_inst/conv_real_o" type="array">
+      <obj_property name="ElementShortName">conv_real_o[15:0]</obj_property>
+      <obj_property name="ObjectShortName">conv_real_o[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/cmp_conv_img_s" type="array">
-      <obj_property name="ElementShortName">cmp_conv_img_s[32:0]</obj_property>
-      <obj_property name="ObjectShortName">cmp_conv_img_s[32:0]</obj_property>
+   <wvobject fp_name="/tb_range_detector/dut/complex_conv_inst/conv_imag_o" type="array">
+      <obj_property name="ElementShortName">conv_imag_o[15:0]</obj_property>
+      <obj_property name="ObjectShortName">conv_imag_o[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_II_vld_s" type="logic">
-      <obj_property name="ElementShortName">fir_II_vld_s</obj_property>
-      <obj_property name="ObjectShortName">fir_II_vld_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/log_samples" type="array">
-      <obj_property name="ElementShortName">log_samples[3:0]</obj_property>
-      <obj_property name="ObjectShortName">log_samples[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_ampl_s" type="array">
-      <obj_property name="ElementShortName">fir_ampl_s[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_ampl_s[15:0]</obj_property>
+   <wvobject fp_name="/tb_range_detector/dut/acc_conv_real_s" type="array">
+      <obj_property name="ElementShortName">acc_conv_real_s[18:0]</obj_property>
+      <obj_property name="ObjectShortName">acc_conv_real_s[18:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_range_detector/dut/fir_phas_s" type="array">
-      <obj_property name="ElementShortName">fir_phas_s[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fir_phas_s[15:0]</obj_property>
+   <wvobject fp_name="/tb_range_detector/dut/acc_conv_imag_s" type="array">
+      <obj_property name="ElementShortName">acc_conv_imag_s[18:0]</obj_property>
+      <obj_property name="ObjectShortName">acc_conv_imag_s[18:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/acc_conv_vld_s" type="logic">
+      <obj_property name="ElementShortName">acc_conv_vld_s</obj_property>
+      <obj_property name="ObjectShortName">acc_conv_vld_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/sys_rst_s" type="logic">
+      <obj_property name="ElementShortName">sys_rst_s</obj_property>
+      <obj_property name="ObjectShortName">sys_rst_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/conv_vld_s" type="logic">
+      <obj_property name="ElementShortName">conv_vld_s</obj_property>
+      <obj_property name="ObjectShortName">conv_vld_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/acc_conv_vld_s" type="logic">
+      <obj_property name="ElementShortName">acc_conv_vld_s</obj_property>
+      <obj_property name="ObjectShortName">acc_conv_vld_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/sys_clk_s" type="logic">
+      <obj_property name="ElementShortName">sys_clk_s</obj_property>
+      <obj_property name="ObjectShortName">sys_clk_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/conv_real_s" type="array">
+      <obj_property name="ElementShortName">conv_real_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">conv_real_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_range_detector/dut/conv_imag_s" type="array">
+      <obj_property name="ElementShortName">conv_imag_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">conv_imag_s[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
 </wave_config>
