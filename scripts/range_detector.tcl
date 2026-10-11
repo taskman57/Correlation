@@ -17,6 +17,9 @@ set proj_dir         "$module_dir/project"
 # 1. Create Vivado Project
 create_project $proj_name $proj_dir -part $target_part -force
 
+# Configure default implementation strategy for high performance net delay closure
+set_property strategy Performance_NetDelay_high [get_runs impl_1]
+
 # 2. Configure Language Properties
 set_property target_language VHDL [current_project]
 set_property simulator_language VHDL [current_project]
@@ -25,7 +28,7 @@ set_property simulator_language VHDL [current_project]
 set target_ip_files [list \
     "$module_dir/ipcores/adc_fifo/adc_fifo.xci" \
     "$module_dir/ipcores/clk_dsp/clk_dsp.xci" \
-    "$module_dir/ipcores/IQ2vector/IQ2vector.xci" \
+    "$module_dir/ipcores/IQ2vector/IQ2Vector.xci" \
 ]
 
 puts "--> Adding targeted IP cores..."

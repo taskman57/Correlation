@@ -14,12 +14,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="420.000001 us"></ZoomEndTime>
-      <Cursor1Time time="400.510000 us"></Cursor1Time>
+      <ZoomStartTime time="398.261914 us"></ZoomStartTime>
+      <ZoomEndTime time="403.299363 us"></ZoomEndTime>
+      <Cursor1Time time="421.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="169"></NameColumnWidth>
+      <NameColumnWidth column_width="165"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="35" />
@@ -191,7 +191,7 @@
       <obj_property name="ElementShortName">vect_ampl_s[15:0]</obj_property>
       <obj_property name="ObjectShortName">vect_ampl_s[15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
       <obj_property name="AnalogYRangeMin">0.000000</obj_property>
       <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
@@ -200,6 +200,7 @@
       <obj_property name="AnalogHorizLine">0.000000</obj_property>
       <obj_property name="CustomSignalColor">#FFA500</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_range_detector/peak_idx_o" type="array">
       <obj_property name="ElementShortName">peak_idx_o[11:0]</obj_property>

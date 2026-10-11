@@ -43,7 +43,7 @@ architecture rtl of complex_convolution is
 
     signal fir_amp_ctr_s    : std_logic;
     signal fir_pha_ctr_s    : std_logic;
-    signal conv_ctr_s       : std_logic_vector(3 downto 0);
+    signal conv_ctr_s       : std_logic_vector(4 downto 0);
 
     signal fir_ampl_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
     signal fir_phas_s       : std_logic_vector(ADC_BIT_RES_C-1 downto 0);
@@ -137,7 +137,7 @@ begin
                 conv_real_o <= (others => '0');
                 conv_imag_o <= (others => '0');
             else
-                if conv_ctr_s(2) = '1' and conv_ctr_s(3) = '0' then     -- just once after start
+                if conv_ctr_s(3) = '1' and conv_ctr_s(4) = '0' then     -- just once after start
                     cnt_en_v   := true;
                 end if;
                 if cnt_en_v then

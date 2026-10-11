@@ -418,8 +418,6 @@ function Correlation(act_prnt, new_test_vector)
     % coherent size abs dump to compare with RTL
     fid = fopen('peak_region_abs.dat', 'w');
     peak_range = 1.64676*abs(full_coh_sum(lag_samples_est-N : lag_samples_est+3*N));
-    figure;
-    plot(peak_range);
     fprintf(fid, '%d\n', peak_range);
     fclose(fid);
 

@@ -70,6 +70,8 @@ The `m_files/` directory contains system-level scripts used to design, quantize,
 
 5. **Golden Vector Dataset (`golden_ref_vector.dat`):** Exported test vector dataset used to populate `rtl_sim/rtl_golden_ref_vector.vhd` for self-checking VHDL simulation.
 
+6. **Reproducing Documented Results:** To verify the pipeline against the documented baseline snapshot, execute `Correlation(0, 0)`. This runs the simulation using the static golden reference vector rather than dynamically generated inputs.
+
 ---
 
 ## Hardware Architecture & Verification
