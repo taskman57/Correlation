@@ -176,9 +176,9 @@ function Correlation(act_prnt, new_test_vector)
             fprintf(rtl, "(\n");
             for k = 1: length(norm_noisy_rx_int)/10
               for j = 1: 10
-                val_uint16 = bitand(int32(real(norm_noisy_rx_int(((k-1)*10)+j, i))), int32(65535));
-                fprintf(fop, "hex2dec('%X'), ", val_uint16);
-                fprintf(rtl, 'x"%04X", ', val_uint16);
+                val_s = real(norm_noisy_rx_int(((k-1)*10)+j, i));
+                fprintf(fop, "%d, ", val_s);
+                fprintf(rtl, 'x"%04X", ', bitand(int32(val_s), int32(65535)));
               endfor
               fprintf(fop, " ...\n");
               fprintf(rtl, '\n');
@@ -194,9 +194,9 @@ function Correlation(act_prnt, new_test_vector)
             fprintf(rtl, "(\n");
             for k = 1: length(norm_noisy_rx_int)/10
               for j = 1: 10
-                val_uint16 = bitand(int32(imag(norm_noisy_rx_int(((k-1)*10)+j, i))), int32(65535));
-                fprintf(fop, "hex2dec('%X'), ", val_uint16);
-                fprintf(rtl, 'x"%04X", ', val_uint16);
+                val_s = imag(norm_noisy_rx_int(((k-1)*10)+j, i));
+                fprintf(fop, "%d, ", val_s);
+                fprintf(rtl, 'x"%04X", ', bitand(int32(val_s), int32(65535)));
               endfor
               fprintf(fop, "...\n");
               fprintf(rtl, '\n');
